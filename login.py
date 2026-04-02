@@ -193,7 +193,9 @@ class LoginWindow(QWidget):
         response,message,role = auth.authenticate_user(email, password)
         print(response)
         if response:
-            QMessageBox.information(self, "Login Success", f"Welcome back! Your role is: {role}")
+            self.user_window = MainDashboard()
+            self.user_window.show()
+            self.close()
         else:
             QMessageBox.warning(self, "Login Failed", message)
             
