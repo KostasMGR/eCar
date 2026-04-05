@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
+            password="8716",
             database="eCar_db"
         )
         
@@ -58,7 +58,7 @@ def CreateCar(car: classes.Car):
             print("Car already exists with license plate: " + car.plate)  
             return False
             
-           
+        car.imgPath = car.plate
         query=" INSERT INTO cars (brand, model, " \
         "production_year, license_plate, seats, cc, state, " \
         "car_description, fuel_type, transmission_type, horsepower, " \
