@@ -69,4 +69,4 @@ def authenticate_user(email, password):
     if user['user_password'] == password:
         return True, "Connection Successful!", user['user_role']
     else:
-        return False, "Wrong Password.", None
+        return False, "Wrong password.", None

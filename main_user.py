@@ -123,10 +123,11 @@ class MainDashboard(QMainWindow):
                 border-left: 4px solid #6a9a83;
             }   
         """)
-
+        
         sidebar_layout = QVBoxLayout(sidebar)
         sidebar_layout.setContentsMargins(0, 22, 0, 18)
         sidebar_layout.setSpacing(6)
+        
 
         logo_wrap = QWidget()
         logo_layout = QVBoxLayout(logo_wrap)
@@ -151,6 +152,7 @@ class MainDashboard(QMainWindow):
         btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
         btn_reservations = self.make_sidebar_button("Reservations")
         btn_settings = self.make_sidebar_button("Settings")
+        btn_logout = self.make_sidebar_button("Logout")
 
         self.nav_group.addButton(btn_dashboard)
         self.nav_group.addButton(btn_reservations)
@@ -160,6 +162,27 @@ class MainDashboard(QMainWindow):
         sidebar_layout.addWidget(btn_reservations)
         sidebar_layout.addWidget(btn_settings)
         sidebar_layout.addStretch()
+
+        self.btn_logout = QPushButton("Logout")
+        self.btn_logout.setCursor(Qt.PointingHandCursor)
+        self.btn_logout.setMinimumHeight(46)
+        self.btn_logout.clicked.connect(self.logout)
+        self.btn_logout.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ff9999;
+                background: transparent;
+            }
+            QPushButton:hover {
+                background-color: #3d2424;
+                color: #ff4444;
+            }
+        """)
+        sidebar_layout.addWidget(self.btn_logout)
 
         shell_layout.addWidget(sidebar)
 
@@ -173,6 +196,22 @@ class MainDashboard(QMainWindow):
         content_layout.setSpacing(0)
 
         shell_layout.addWidget(content)
+
+        btn_logout.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ff9999;
+                background: transparent;
+            }
+            QPushButton:hover {
+                background-color: #3d2424;
+                color: #ff4444;
+            }
+        """)
 
         # Banner
         banner = QFrame()
@@ -238,6 +277,13 @@ class MainDashboard(QMainWindow):
         banner_layout.addLayout(stats_row)
 
         content_layout.addWidget(banner)
+        
+        #Logout Button
+        btn_logout = QPushButton(" Logout")
+        btn_logout.setCursor(Qt.PointingHandCursor)
+        btn_logout.setMinimumHeight(46)
+        btn_logout.clicked.connect(self.logout)
+
 
         # Toolbar
         toolbar = QWidget()
@@ -391,7 +437,11 @@ class MainDashboard(QMainWindow):
             except ValueError:
                 print("Error please enter only numbers!")
           
-            
+    def logout(self):
+        from login import LoginWindow
+        self.login_window = LoginWindow() 
+        self.login_window.show()
+        self.close()      
 
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
