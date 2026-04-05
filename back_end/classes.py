@@ -1,9 +1,9 @@
 from back_end import classes
 
 class User:
-    def __init__(self,uid: int,password: str, role: str, firstname: str ,
+    def __init__(self,username:str,password: str, role: str, firstname: str ,
                   surname:str,email: str, phone: int, license_no: int, license_type: str):
-        self.uid=uid
+        self.username=username
         self.password=password
         self.role=role
         self.firstname=firstname

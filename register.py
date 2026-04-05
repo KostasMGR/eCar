@@ -183,7 +183,7 @@ class RegisterWindow(QWidget):
         # 3. Έλεγχος τύπου εισόδου
         # Εδώ στέλνεις τα δεδομένα στο back-end
         users = classes.User(username, password, "Customer", firstName, surname, email, phoneNumber, licenseNumber, licenseType)
-        response = functions.CreateUser(users)
+        response = functions.RegisterUser(users)
         if response:
             print(f"Signing up: {username}, {email}")
             QMessageBox.information(self, "Επιτυχία", "Ο λογαριασμός δημιουργήθηκε!")

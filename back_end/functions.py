@@ -1,14 +1,14 @@
 
 import mysql.connector
-from . import classes
-
+#import classes
+from back_end import classes
 def ConnectDB():
     try:
         # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="root",
+            password="8716",
             database="eCar_db"
         )
         
@@ -58,7 +58,7 @@ def CreateCar(car: classes.Car):
             print("Car already exists with license plate: " + car.plate)  
             return False
             
-        car.imgPath = car.plate
+           
         query=" INSERT INTO cars (brand, model, " \
         "production_year, license_plate, seats, cc, state, " \
         "car_description, fuel_type, transmission_type, horsepower, " \
@@ -75,57 +75,67 @@ def CreateCar(car: classes.Car):
         db.close()
         conn.close()
 
-def FilterCars(price: float, year: int, cc: int, horses: int):
+def GetUsers():
     try:
         conn, db = ConnectDB()
-        prflag = False
-        yrflag = False
-        ccflag = False
-        horseflag = False
+        query = "SELECT * FROM users;"
+        db.execute(query)
+        users = db.fetchall()
+        return users
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την ανάκτηση χρηστών (GetUsers): {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
 
-        query = "SELECT * FROM cars"
-
+def FilterCars(price: float, year: int, cc: int , horses: int):
+    try:
+        conn,db=ConnectDB()
+        prflag=False
+        yrflag=False
+        ccflag=False
+        horseflag=False
+        query="select * from cars"
         if price is not None:
-            query += " WHERE "
-            prflag = True
-            query += "price=" + str(price)
+            query=query+ " where "
+            prflag=True
+            query=query+" price='"+str(price)+"'"
 
         if year is not None:
             if prflag:
-                query += " AND production_year=" + str(year)
+                query=query+"and production_year='"+str(year)+"'"
             else:
-                query += " WHERE production_year=" + str(year)
-            yrflag = True
+                query=query+" production_year='"+str(year)+"'"
+            yrflag=True
 
         if cc is not None:
             if prflag or yrflag:
-                query += " AND cc=" + str(cc)
+                query=query + "and cc='"+str(cc)+"'"
             else:
-                query += " WHERE cc=" + str(cc)
-            ccflag = True
-
+                query=query + " cc='"+str(cc)+"'"
+            ccflag=True
         if horses is not None:
             if prflag or yrflag or ccflag:
-                query += " AND horsepower=" + str(horses)
+                query=query+" and horsepower='"+str(horses)+"'"
             else:
-                query += " WHERE horsepower=" + str(horses)
-            horseflag = True
-
-        query += ";"
-
-        print(query)  # debug
+                query=query+" horsepower='"+str(horses)+"'"
+            horseflag=True
+            
+        query=query+";"
         db.execute(query)
         cars = db.fetchall()
         return cars
 
     except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         return False
     finally:
         db.close()
         conn.close()
+    
 
-#TODO update/cars, register  
+#TODO update/cars
 
 def CheckUserExists(user: classes.User):
     try:
@@ -144,18 +154,18 @@ def CheckUserExists(user: classes.User):
         db.close()
         conn.close()
 
-def CreateUser(user: classes.User):
+def RegisterUser(user: classes.User):
     try:
         conn,db = ConnectDB()
         if CheckUserExists(user):
             print("User already exists with email: " + user.email)  
             return False
         
-        query=" INSERT INTO users (user_password, " \
+        query=" INSERT INTO users (username, user_password, " \
         "user_role, first_name, surname, email, phone_number, " \
         "license_number, license_type) VALUES (" \
-        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s)"
-        db.execute(query,(user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s,%s)"
+        db.execute(query,(user.username,user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
                           user.license_type))
         conn.commit()
         return True
@@ -165,6 +175,76 @@ def CreateUser(user: classes.User):
     finally:
         db.close()
         conn.close()
+
+def GiveDealerAccess(email: str):
+    try:
+        conn, db = ConnectDB()
+        
+        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
+        check_query = "SELECT user_role FROM users WHERE email = %s"
+        db.execute(check_query, (email,))
+        user = db.fetchone()
+        
+        if user is None:
+            print(f"Προσοχή: Δεν βρέθηκε χρήστης με το email {email}.")
+            return False
+            
+        if user['user_role'] == 'Dealer':
+            print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Dealer! Δεν χρειάζεται αλλαγή.")
+            return True
+        
+        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Dealer, του αλλάζουμε ρόλο!
+        update_query = "UPDATE users SET user_role = 'Dealer' WHERE email = %s"
+        db.execute(update_query, (email,))
+        conn.commit()
+        
+        print(f"Επιτυχία! Ο χρήστης {email} είναι πλέον Dealer.")
+        return True
+        
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την αλλαγή σε Dealer: {err}")
+        return False
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def GiveAdminAccess(email: str):
+    try:
+        conn, db = ConnectDB()
+        
+        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
+        check_query = "SELECT user_role FROM users WHERE email = %s"
+        db.execute(check_query, (email,))
+        user = db.fetchone()
+        
+        # Αν η βάση επιστρέψει None, ο χρήστης δεν υπάρχει!
+        if user is None:
+            print(f"Προσοχή: Δεν βρέθηκε χρήστης με το email {email}.")
+            return False
+            
+        # Αν υπάρχει, ελέγχουμε τον τωρινό του ρόλο
+        if user['user_role'] == 'Admin':
+            print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Admin! Δεν χρειάζεται αλλαγή.")
+            return True
+        
+        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Admin, τον αναβαθμίζουμε!
+        update_query = "UPDATE users SET user_role = 'Admin' WHERE email = %s"
+        db.execute(update_query, (email,))
+        conn.commit()
+        
+        print(f"Επιτυχία! Ο χρήστης {email} αναβαθμίστηκε σε Admin.")
+        return True
+        
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την αναβάθμιση σε Admin: {err}")
+        return False
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def DeleteCar(car: classes.Car):
     try:
@@ -182,3 +262,34 @@ def DeleteCar(car: classes.Car):
     finally:
         db.close()
         conn.close()
+
+def GetSortedCars(sort_by: str, descending: bool = False):
+    try:
+        conn, db = ConnectDB()
+
+        valid_columns = {
+            "price": "price",
+            "year": "production_year",
+            "cc": "cc"
+        }
+        if sort_by not in valid_columns:
+            print(f"Προσοχή: Μη έγκυρο κριτήριο ταξινόμησης '{sort_by}'.")
+            return None
+        
+        db_column = valid_columns[sort_by]
+        order = "DESC" if descending else "ASC"
+
+        query = f"SELECT * FROM cars ORDER BY {db_column} {order};"
+        db.execute(query)
+
+        cars = db.fetchall()
+        return cars
+    
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την ταξινόμηση (GetSortedCars): {err}")
+        return None
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
