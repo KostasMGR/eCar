@@ -105,15 +105,29 @@ class RegisterWindow(QWidget):
         self.licenseType_input.setPlaceholderText("License Type")
         self.licenseType_input.setStyleSheet(input_style)
 
+        # PASSWORD INPUT
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setStyleSheet(input_style)
 
+        # Action για το κύριο password με PNG
+        self.toggle_pw_action = QAction(self)
+        self.toggle_pw_action.setIcon(QIcon('assets/eye_hide.png')) # Αρχικό εικονίδιο (κρυμμένο)
+        self.password_input.addAction(self.toggle_pw_action, QLineEdit.TrailingPosition)
+        self.toggle_pw_action.triggered.connect(lambda: self.toggle_password_visibility(self.password_input, self.toggle_pw_action))
+
+        # CONFIRM PASSWORD INPUT
         self.confirm_password_input = QLineEdit()
         self.confirm_password_input.setPlaceholderText("Confirm Password")
         self.confirm_password_input.setEchoMode(QLineEdit.Password)
         self.confirm_password_input.setStyleSheet(input_style)
+
+        # Action για το confirm password με PNG
+        self.toggle_confirm_pw_action = QAction(self)
+        self.toggle_confirm_pw_action.setIcon(QIcon('assets/eye_hide.png')) # Αρχικό εικονίδιο (κρυμμένο)
+        self.confirm_password_input.addAction(self.toggle_confirm_pw_action, QLineEdit.TrailingPosition)
+        self.toggle_confirm_pw_action.triggered.connect(lambda: self.toggle_password_visibility(self.confirm_password_input, self.toggle_confirm_pw_action))
     
         # REGISTER BUTTON
         self.register_button = QPushButton("REGISTER")
@@ -181,8 +195,7 @@ class RegisterWindow(QWidget):
         if password != confirm_pw:
             QMessageBox.warning(self, "Error", "Passwords dont match!")
             return
-        # 3. Έλεγχος τύπου εισόδου
-        # Εδώ στέλνεις τα δεδομένα στο back-end
+        
         users = classes.User(username, password, "Customer", firstName, surname, email, phoneNumber, licenseNumber, licenseType)
         response = functions.RegisterUser(users)
         if response:
@@ -201,6 +214,14 @@ class RegisterWindow(QWidget):
             self.bg_label.setPixmap(scaled_pixmap)
             self.bg_label.resize(self.size())
         super().resizeEvent(event)
+    def toggle_password_visibility(self, line_edit, action):
+        if line_edit.echoMode() == QLineEdit.Password:
+            line_edit.setEchoMode(QLineEdit.Normal)
+            action.setIcon(QIcon('assets/eye_show.png'))
+        else:
+            line_edit.setEchoMode(QLineEdit.Password)
+            action.setIcon(QIcon('assets/eye_hide.png'))
+    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
