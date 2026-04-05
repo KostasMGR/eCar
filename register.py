@@ -109,24 +109,11 @@ class RegisterWindow(QWidget):
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setStyleSheet(input_style)
 
-        # 1. Για το κύριο Password
-        '''   self.toggle_pw_action = QAction(self)
-        ```# Χρήση QStyle.StandardPixmap για συμβατότητα
-        self.toggle_pw_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_LineEditViewPasswordReturn))
-        self.password_input.addAction(self.toggle_pw_action, QLineEdit.TrailingPosition)
-        self.toggle_pw_action.triggered.connect(lambda: self.toggle_password_visibility(self.password_input, self.toggle_pw_action))'''
-
-        # 2. Για το Confirm Password
         self.confirm_password_input = QLineEdit()
         self.confirm_password_input.setPlaceholderText("Confirm Password")
         self.confirm_password_input.setEchoMode(QLineEdit.Password)
         self.confirm_password_input.setStyleSheet(input_style)
     
-        '''        self.toggle_confirm_pw_action = QAction(self)
-        self.toggle_confirm_pw_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_LineEditViewPasswordReturn))
-        self.confirm_password_input.addAction(self.toggle_confirm_pw_action, QLineEdit.TrailingPosition)
-        self.toggle_confirm_pw_action.triggered.connect(lambda: self.toggle_password_visibility(self.confirm_password_input, self.toggle_confirm_pw_action))
-        '''
         # REGISTER BUTTON
         self.register_button = QPushButton("REGISTER")
         self.register_button.setMinimumHeight(48)
@@ -195,10 +182,14 @@ class RegisterWindow(QWidget):
             return
         # 3. Έλεγχος τύπου εισόδου
         # Εδώ στέλνεις τα δεδομένα στο back-end
-        users = classes.User(None, password, None, firstName, surname, email, phoneNumber, licenseNumber, licenseType)
-        response = functions.CreateUser()
-        print(f"Signing up: {username}, {email}")
-        QMessageBox.information(self, "Επιτυχία", "Ο λογαριασμός δημιουργήθηκε!")
+        users = classes.User(username, password, "Customer", firstName, surname, email, phoneNumber, licenseNumber, licenseType)
+        response = functions.CreateUser(users)
+        if response:
+            print(f"Signing up: {username}, {email}")
+            QMessageBox.information(self, "Επιτυχία", "Ο λογαριασμός δημιουργήθηκε!")
+        else:
+            print(f"Error Signing up user!")
+            QMessageBox.information(self, "Error!", "Ο λογαριασμός δεν δημιουργήθηκε!")
 
     def resizeEvent(self, event):
         if not self.original_pixmap.isNull():
@@ -206,14 +197,6 @@ class RegisterWindow(QWidget):
             self.bg_label.setPixmap(scaled_pixmap)
             self.bg_label.resize(self.size())
         super().resizeEvent(event)
-    
-'''    def toggle_password_visibility(self, line_edit, action):
-            if line_edit.echoMode() == QLineEdit.Password:
-                line_edit.setEchoMode(QLineEdit.Normal)
-                action.setIcon(self.style().standardIcon(QStyle.SP_DialogNoButton))
-            else:
-                line_edit.setEchoMode(QLineEdit.Password)
-                action.setIcon(self.style().standardIcon(self.style().SP_LineEditViewPasswordReturn))'''
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
