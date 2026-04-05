@@ -351,6 +351,25 @@ class MainDashboard(QMainWindow):
             if widget:
                 widget.deleteLater()
                 
+        if not cars_list:   # Filtered list is empty (no cars match the criteria           
+                no_cars_label = QLabel("Δεν βρέθηκαν οχήματα με αυτά τα κριτήρια αναζήτησης.")
+                no_cars_label.setAlignment(Qt.AlignCenter)
+                no_cars_label.setStyleSheet("""
+                    color: #8a94a6; 
+                    font-size: 20px; 
+                    font-weight: bold; 
+                    margin-top: 60px;
+                """)
+                
+                self.grid.addWidget(no_cars_label, 0, 0, 1, 3) 
+                
+                self.right_info_label.setText("Showing <b>0</b> vehicles")// panw bar deixnei 0
+                
+                return 
+                    
+                self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
+
+
         row = 0
         col = 0
         for car in cars_list:
@@ -360,6 +379,7 @@ class MainDashboard(QMainWindow):
             if col > 2:
                 col = 0
                 row += 1
+        
 
     def open_filters(self):
         dialog = FilterDialog(self)
