@@ -66,9 +66,9 @@ class MainDashboard(QMainWindow):
             QWidget {
                 background: qlineargradient(
                     x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #0d4fa3,
-                    stop:0.45 #1b6fd8,
-                    stop:1 #4fa3ff
+                    stop:0 #3a5a54,
+                    stop:0.5 #2d3e3a,
+                    stop:1 #4a6d64
                 );
             }
         """)
@@ -77,8 +77,8 @@ class MainDashboard(QMainWindow):
         app_shell.setObjectName("AppShell")
         app_shell.setStyleSheet("""
             QFrame#AppShell {
-                background-color: #f5f7fb;
-                border-radius: 18px;
+                background-color: #f0f4f3;
+                border-radius: 20px;
             }
         """)
 
@@ -95,31 +95,31 @@ class MainDashboard(QMainWindow):
         sidebar.setFixedWidth(220)
         sidebar.setStyleSheet("""
             QFrame {
-                background-color: #101826;
-                border-top-left-radius: 18px;
-                border-bottom-left-radius: 18px;
+                background-color: #1a2b27;
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
             }
             QLabel {
                 background: transparent;
             }
             QPushButton {
                 text-align: left;
-                padding: 14px 20px;
+                padding: 14px 22px;
                 border: none;
                 font-size: 14px;
                 font-weight: 600;
-                color: #b6c0cf;
+                color: #a3c9b8;
                 background: transparent;
-                border-left: 3px solid transparent;
+                border-left: 4px solid transparent;
             }
             QPushButton:hover {
-                background-color: #182233;
+                background-color: #243a34;
                 color: white;
             }
             QPushButton:checked {
-                background-color: #253247;
+                background-color: #2d3e3a;
                 color: white;
-                border-left: 3px solid #4ea1ff;
+                border-left: 4px solid #6a9a83;
             }   
         """)
 
@@ -177,13 +177,12 @@ class MainDashboard(QMainWindow):
         banner = QFrame()
         banner.setFixedHeight(190)
         banner.setStyleSheet("""
-            QFrame {
-                border-top-right-radius: 18px;
-                background: qlineargradient(
-                    x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #6ca8ff,
-                    stop:0.45 #3e84e8,
-                    stop:1 #1f5fbe
+         QFrame {
+            border-top-right-radius: 20px;
+            background: qlineargradient(
+                x1:0, y1:0, x2:1, y2:0,
+                stop:0 #6a9a83,
+                stop:1 #3a5a54
                 );
             }
         """)
@@ -242,12 +241,7 @@ class MainDashboard(QMainWindow):
         # Toolbar
         toolbar = QWidget()
         toolbar.setFixedHeight(72)
-        toolbar.setStyleSheet("""
-            QWidget {
-                background-color: #ffffff;
-                border-bottom: 1px solid #e8edf5;
-            }
-        """)
+        toolbar.setStyleSheet("background-color: white; border-bottom: 1px solid #e0e8e5;")
 
         toolbar_layout = QHBoxLayout(toolbar)
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
@@ -271,22 +265,19 @@ class MainDashboard(QMainWindow):
         btn_filter.setEnabled(True)  # frontend only
         btn_filter.clicked.connect(self.open_filters)
         btn_filter.setStyleSheet("""
-            QPushButton {
-                background-color: #2563eb; 
-                color: white;         
-                border: none;
-                border-radius: 10px;
-                padding: 10px 16px;
-                font-size: 13px;
-                font-weight: 800;
+        QPushButton {
+            background-color: #6a9a83; 
+            color: white; 
+            border-radius: 10px; 
+            padding: 10px 18px; 
+            font-weight: bold; 
+            font-size: 13px;
             }
-            
-            QPushButton:hover {
-                background-color: #1d4ed8; 
-            }
-            
+            QPushButton:hover { 
+                background-color: #5a8571; 
+            }                
             QPushButton:pressed {
-                background-color: #1e3a8a; 
+                background-color: #5a8571; 
                 padding-top: 12px;        
                 padding-bottom: 8px;       
                
@@ -424,12 +415,12 @@ class MainDashboard(QMainWindow):
     def make_small_chip(self, text):
         chip = QLabel(text)
         chip.setStyleSheet("""
-            background-color: #f3f6fb;
-            color: #49576a;
-            border: 1px solid #e5ebf4;
-            padding: 5px 9px;
-            border-radius: 9px;
-            font-size: 11px;
+            background-color: #e8efec; 
+            color: #3a5a54; 
+            border: 1px solid #d1ddd9; 
+            padding: 4px 8px; 
+            border-radius: 8px; 
+            font-size: 10px; 
             font-weight: 700;
         """)
         return chip
@@ -442,8 +433,8 @@ class MainDashboard(QMainWindow):
         card.setStyleSheet("""
             QFrame {
                 background-color: white;
-                border: 1px solid #e5ebf4;
-                border-radius: 16px;
+                border: 1px solid #d1ddd9;
+                border-radius: 15px;
             }
             QFrame:hover {
                 border: 1px solid #cfd9e8;
