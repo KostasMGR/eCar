@@ -260,8 +260,8 @@ class MainDashboard(QMainWindow):
             background: transparent;
         """)
 
-        right_info = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
-        right_info.setStyleSheet("""
+        self.right_info_label = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
+        self.right_info_label.setStyleSheet("""
             color: #556070;
             font-size: 14px;
             background: transparent;
@@ -298,7 +298,7 @@ class MainDashboard(QMainWindow):
 
         toolbar_layout.addWidget(left_info)
         toolbar_layout.addStretch()
-        toolbar_layout.addWidget(right_info)
+        toolbar_layout.addWidget(self.right_info_label)
         toolbar_layout.addWidget(btn_filter)
 
         content_layout.addWidget(toolbar)
@@ -363,10 +363,10 @@ class MainDashboard(QMainWindow):
                 
                 self.grid.addWidget(no_cars_label, 0, 0, 1, 3) 
                 
-                self.right_info_label.setText("Showing <b>0</b> vehicles")// panw bar deixnei 0
+                self.right_info_label.setText("Showing <b>0</b> vehicles")
                 
                 return 
-                    
+                
                 self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
 

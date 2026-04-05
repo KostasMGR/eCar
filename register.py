@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon, QAction
 from back_end import functions as functions
 from back_end import classes as classes 
+from login import LoginWindow
 
 class RegisterWindow(QWidget):
     def __init__(self):
@@ -187,6 +188,9 @@ class RegisterWindow(QWidget):
         if response:
             print(f"Signing up: {username}, {email}")
             QMessageBox.information(self, "Επιτυχία", "Ο λογαριασμός δημιουργήθηκε!")
+            self.user_window = LoginWindow()
+            self.user_window.show()
+            self.close()
         else:
             print(f"Error Signing up user!")
             QMessageBox.information(self, "Error!", "Ο λογαριασμός δεν δημιουργήθηκε!")
