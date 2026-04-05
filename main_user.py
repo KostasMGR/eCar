@@ -1,11 +1,46 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit
 )
 from PySide6.QtCore import Qt
 from back_end import functions
 from PySide6.QtGui import QPixmap
+
+class FilterDialog(QDialog):
+    def __init__(self, parent=None): 
+        super().__init__(parent)
+        self.setWindowTitle("Filter")
+        layout = QVBoxLayout(self)
+
+        form = QFormLayout()
+        self.price_input = QLineEdit()
+        self.year_input = QLineEdit()
+        self.cc_input = QLineEdit()
+        self.hp_input = QLineEdit()
+        
+        form.addRow("Max Price (€):", self.price_input)
+        form.addRow("Min Year:", self.year_input)
+        form.addRow("Min CC:", self.cc_input)
+        form.addRow("Min HP:", self.hp_input)
+        layout.addLayout(form)
+        
+        btn = QPushButton("Εφαρμογή")
+        btn.clicked.connect(self.accept)
+        layout.addWidget(btn)
+
+    def get_values(self):
+        p = self.price_input.text().strip()
+        y = self.year_input.text().strip()
+        cc = self.cc_input.text().strip()
+        hp = self.hp_input.text().strip()
+
+        return (
+            float(p) if p else None,
+            int(y) if y else None,
+            int(cc) if cc else None,
+            int(hp) if hp else None
+        )
 
 class MainDashboard(QMainWindow):
     def __init__(self):
@@ -233,16 +268,31 @@ class MainDashboard(QMainWindow):
         """)
 
         btn_filter = QPushButton("Filter")
-        btn_filter.setEnabled(False)  # frontend only
+        btn_filter.setEnabled(True)  # frontend only
+        btn_filter.clicked.connect(self.open_filters)
         btn_filter.setStyleSheet("""
             QPushButton {
-                background-color: #eef1f5;
-                color: #8a94a6;
-                border: 1px solid #dde3ec;
+                background-color: #2563eb; /* Βασικό μπλε χρώμα */
+                color: white;              /* Λευκά γράμματα */
+                border: none;
                 border-radius: 10px;
-                padding: 9px 16px;
+                padding: 10px 16px;
                 font-size: 13px;
-                font-weight: 700;
+                font-weight: 800;
+            }
+            
+            QPushButton:hover {
+                /* Hover (η κατάσταση όταν απλά περνάς το ποντίκι από πάνω χωρίς να κάνεις κλικ) */
+                background-color: #1d4ed8; /* Γίνεται ένα "κλικ" πιο σκούρο μπλε */
+            }
+            
+            QPushButton:pressed {
+                /* Pressed (η ακριβής στιγμή που κρατάς πατημένο το αριστερό κλικ) */
+                background-color: #1e3a8a; /* Γίνεται ακόμα πιο σκούρο */
+                padding-top: 12px;         /* Προσθέτει κενό από πάνω... */
+                padding-bottom: 8px;       /* ...και αφαιρεί από κάτω */
+                /* Αυτό το κόλπο με το padding κάνει το κείμενο να "πηδάει" 
+                   προς τα κάτω, δίνοντας την τέλεια ψευδαίσθηση φυσικού κουμπιού! */
             }
         """)
 
@@ -282,24 +332,62 @@ class MainDashboard(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
-        grid = QGridLayout(scroll_content)
-        grid.setContentsMargins(28, 24, 28, 28)
-        grid.setHorizontalSpacing(22)
-        grid.setVerticalSpacing(22)
+       # grid = QGridLayout(scroll_content)
+       # grid.setContentsMargins(28, 24, 28, 28)
+       # grid.setHorizontalSpacing(22)
+       # grid.setVerticalSpacing(22)
 
+        self.grid = QGridLayout(scroll_content)
+        self.grid.setContentsMargins(28, 24, 28, 28)
+        self.grid.setHorizontalSpacing(22)
+        self.grid.setVerticalSpacing(22)
+
+        # Αντί για τη λούπα, καλούμε τη νέα συνάρτηση
+        self.update_grid(self.cars)
+
+        scroll.setWidget(scroll_content)
+        content_layout.addWidget(scroll)
+       
+
+
+        scroll.setWidget(scroll_content)
+        content_layout.addWidget(scroll)
+
+    def update_grid(self, cars_list):
+        # 1. Καθαρίζουμε την οθόνη από τα παλιά αμάξια
+        for i in reversed(range(self.grid.count())):
+            widget = self.grid.itemAt(i).widget()
+            if widget:
+                widget.deleteLater()
+                
+        # 2. Ζωγραφίζουμε τα νέα
         row = 0
         col = 0
-        for car in self.cars:
+        for car in cars_list:
             card = self.create_car_card(car)
-            grid.addWidget(card, row, col)
-
+            self.grid.addWidget(card, row, col)
             col += 1
             if col > 2:
                 col = 0
                 row += 1
 
-        scroll.setWidget(scroll_content)
-        content_layout.addWidget(scroll)
+    def open_filters(self):
+        dialog = FilterDialog(self)
+        if dialog.exec():
+            try:
+                # Παίρνουμε τα 4 νούμερα από το Popup
+                price, year, cc, hp = dialog.get_values()
+                
+                # Αν είναι όλα άδεια, φέρε πάλι όλα τα αμάξια
+                if all(v is None for v in [price, year, cc, hp]):
+                    filtered = functions.GetCars()
+                else:
+                    filtered = functions.FilterCars(price, year, cc, hp)
+                
+                print("Φιλτραρισμένα αυτοκίνητα:", filtered)  # Debug print για να δούμε τι επιστρέφει η βάση
+                self.update_grid(filtered)
+            except ValueError:
+                print("Σφάλμα: Παρακαλώ εισάγετε μόνο νούμερα στα φίλτρα.")
 
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
