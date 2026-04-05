@@ -174,12 +174,12 @@ class RegisterWindow(QWidget):
         
         # 1. Έλεγχος κενών πεδίων
         if not all([username, firstName, surname, email, password, confirm_pw, licenseNumber, licenseType, phoneNumber]):
-            QMessageBox.warning(self, "Σφάλμα", "Παρακαλώ συμπληρώστε όλα τα πεδία.")
+            QMessageBox.warning(self, "Error", "Please fill all the fields.")
             return
 
         # 2. Έλεγχος αν οι κωδικοί ταιριάζουν
         if password != confirm_pw:
-            QMessageBox.warning(self, "Σφάλμα", "Οι κωδικοί δεν ταιριάζουν!")
+            QMessageBox.warning(self, "Error", "Passwords dont match!")
             return
         # 3. Έλεγχος τύπου εισόδου
         # Εδώ στέλνεις τα δεδομένα στο back-end
@@ -187,13 +187,13 @@ class RegisterWindow(QWidget):
         response = functions.RegisterUser(users)
         if response:
             print(f"Signing up: {username}, {email}")
-            QMessageBox.information(self, "Επιτυχία", "Ο λογαριασμός δημιουργήθηκε!")
+            QMessageBox.information(self, "Success", "User created successfully!")
             self.user_window = LoginWindow()
             self.user_window.show()
             self.close()
         else:
             print(f"Error Signing up user!")
-            QMessageBox.information(self, "Error!", "Ο λογαριασμός δεν δημιουργήθηκε!")
+            QMessageBox.information(self, "Error!", "User not created!")
 
     def resizeEvent(self, event):
         if not self.original_pixmap.isNull():

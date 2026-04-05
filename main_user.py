@@ -282,8 +282,7 @@ class MainDashboard(QMainWindow):
             }
             
             QPushButton:hover {
-                /* Hover (η κατάσταση όταν απλά περνάς το ποντίκι από πάνω χωρίς να κάνεις κλικ) */
-                background-color: #1d4ed8; /* Γίνεται ένα "κλικ" πιο σκούρο μπλε */
+                background-color: #1d4ed8; 
             }
             
             QPushButton:pressed {
@@ -352,7 +351,7 @@ class MainDashboard(QMainWindow):
                 widget.deleteLater()
                 
         if not cars_list:   # Filtered list is empty (no cars match the criteria           
-                no_cars_label = QLabel("Δεν βρέθηκαν οχήματα με αυτά τα κριτήρια αναζήτησης.")
+                no_cars_label = QLabel("No cars matched these criterias.")
                 no_cars_label.setAlignment(Qt.AlignCenter)
                 no_cars_label.setStyleSheet("""
                     color: #8a94a6; 
@@ -395,7 +394,7 @@ class MainDashboard(QMainWindow):
                 if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
                     self.update_grid(filtered)
                 else:
-                    print(f"funtions.py den esteile thn lista {filtered}")
+                    print(f"functions.py den esteile thn lista {filtered}")
                     self.update_grid([]) # an den esteile lista, emfanise keno
             except ValueError:
                 print("Error please enter only numbers!")

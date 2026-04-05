@@ -17,10 +17,9 @@ class LoginWindow(QWidget):
         
         
 
-        # 2. ΦΤΙΑΧΝΟΥΜΕ ΤΟ BACKGROUND ME QPIXMAP
         self.bg_label = QLabel(self)
-        self.bg_label.lower() # Το στέλνουμε τέρμα πίσω, κάτω από όλα τα άλλα
-        self.original_pixmap = QPixmap('assets/bg.jpg') # Φορτώνουμε τη φωτογραφία
+        self.bg_label.lower() 
+        self.original_pixmap = QPixmap('assets/bg.jpg') 
 
         # MAIN LAYOUT
         main_layout = QVBoxLayout()
@@ -28,7 +27,7 @@ class LoginWindow(QWidget):
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
 
-        # CONTAINER (Αφαιρέσαμε το παλιό background από εδώ για να μην εμποδίζει)
+        
         container = QWidget()
         container.setStyleSheet("background: transparent;") 
         main_layout.addWidget(container)
@@ -173,18 +172,16 @@ class LoginWindow(QWidget):
 
         self.showMaximized()
 
-    # 3. Ο ΜΗΧΑΝΙΣΜΟΣ ΠΟΥ ΚΑΝΕΙ ΤΗΝ ΕΙΚΟΝΑ RESPONSIVE
     def resizeEvent(self, event):
-        # Αυτή η συνάρτηση τρέχει αυτόματα κάθε φορά που αλλάζεις μέγεθος στο παράθυρο
+        
         if not self.original_pixmap.isNull():
-            # Κλιμακώνουμε την εικόνα στο νέο μέγεθος του παραθύρου
             scaled_pixmap = self.original_pixmap.scaled(
                 self.size(), 
-                Qt.KeepAspectRatioByExpanding, # Κρατάει αναλογίες (σαν το CSS cover)
-                Qt.SmoothTransformation        # Κάνει απαλό ζουμ χωρίς να "πιξελιάζει"
+                Qt.KeepAspectRatioByExpanding, 
+                Qt.SmoothTransformation        
             )
             self.bg_label.setPixmap(scaled_pixmap)
-            self.bg_label.resize(self.size()) # Το Label πιάνει όλο τον διαθέσιμο χώρο
+            self.bg_label.resize(self.size()) 
         super().resizeEvent(event)
 
     def handle_login(self):
