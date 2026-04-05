@@ -75,51 +75,55 @@ def CreateCar(car: classes.Car):
         db.close()
         conn.close()
 
-def FilterCars(price: float, year: int, cc: int , horses: int):
+def FilterCars(price: float, year: int, cc: int, horses: int):
     try:
-        conn,db=ConnectDB()
-        prflag=False
-        yrflag=False
-        ccflag=False
-        horseflag=False
-        query="select * from cars"
+        conn, db = ConnectDB()
+        prflag = False
+        yrflag = False
+        ccflag = False
+        horseflag = False
+
+        query = "SELECT * FROM cars"
+
         if price is not None:
-            query=" where "
-            prflag=True
-            query=query+" price='"+str(price)+"'"
+            query += " WHERE "
+            prflag = True
+            query += "price=" + str(price)
 
         if year is not None:
             if prflag:
-                query=query+"and production_year='"+str(year)+"'"
+                query += " AND production_year=" + str(year)
             else:
-                query=query+" production_year='"+str(year)+"'"
-            yrflag=True
+                query += " WHERE production_year=" + str(year)
+            yrflag = True
 
         if cc is not None:
             if prflag or yrflag:
-                query=query + "and cc='"+str(cc)+"'"
+                query += " AND cc=" + str(cc)
             else:
-                query=query + " cc='"+str(cc)+"'"
-            ccflag=True
+                query += " WHERE cc=" + str(cc)
+            ccflag = True
+
         if horses is not None:
             if prflag or yrflag or ccflag:
-                query=query+" and horsepower='"+str(horses)+"'"
+                query += " AND horsepower=" + str(horses)
             else:
-                query=query+" horsepower='"+str(horses)+"'"
-            horseflag=True
-            
-        query=query+";"
+                query += " WHERE horsepower=" + str(horses)
+            horseflag = True
+
+        query += ";"
+
+        print(query)  # debug
         db.execute(query)
         cars = db.fetchall()
         return cars
 
     except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")
         return False
     finally:
         db.close()
         conn.close()
-    
 
 #TODO update/cars, register  
 
