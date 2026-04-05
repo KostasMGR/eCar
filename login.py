@@ -5,9 +5,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QFrame, QMessageBox
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon, QAction
 from back_end import authentication as auth
 from main_user import MainDashboard
+
 
 
 class LoginWindow(QWidget):
@@ -82,6 +83,11 @@ class LoginWindow(QWidget):
         self.password_input.setPlaceholderText("Enter password")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setMinimumHeight(46)
+
+        self.toggle_pw_action = QAction(self)
+        self.toggle_pw_action.setIcon(QIcon('assets/eye_hide.png')) 
+        self.password_input.addAction(self.toggle_pw_action, QLineEdit.TrailingPosition)
+        self.toggle_pw_action.triggered.connect(lambda: self.toggle_password_visibility(self.password_input, self.toggle_pw_action))
 
         self.email_input.setStyleSheet("""
             QLineEdit {
@@ -196,12 +202,19 @@ class LoginWindow(QWidget):
         else:
             QMessageBox.warning(self, "Login Failed", message)
             
-
-
-       
-
     def handle_register(self):
-        QMessageBox.information(self, "Register", "Temporary register screen.")
+        from register import RegisterWindow
+        self.user_window = RegisterWindow()
+        self.user_window.show()
+        self.close()
+    
+    def toggle_password_visibility(self, line_edit, action):
+        if line_edit.echoMode() == QLineEdit.Password:
+            line_edit.setEchoMode(QLineEdit.Normal)
+            action.setIcon(QIcon('assets/eye_show.png'))
+        else:
+            line_edit.setEchoMode(QLineEdit.Password)
+            action.setIcon(QIcon('assets/eye_hide.png'))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

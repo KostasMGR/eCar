@@ -150,6 +150,7 @@ class RegisterWindow(QWidget):
         self.back_to_login = QPushButton("Already a member? Login")
         self.back_to_login.setCursor(Qt.PointingHandCursor)
         self.back_to_login.setStyleSheet("color: white; border: none; background: transparent; text-decoration: underline;")
+        self.back_to_login.clicked.connect(self.go_to_login)
 
         # ΠΡΟΣΘΗΚΗ ΣΤΑ LAYOUTS
         card_layout.addWidget(title)
@@ -188,25 +189,25 @@ class RegisterWindow(QWidget):
         
         # 1. Έλεγχος κενών πεδίων
         if not all([username, firstName, surname, email, password, confirm_pw, licenseNumber, licenseType, phoneNumber]):
-            QMessageBox.warning(self, "Error", "Please fill all the fields.")
+            QMessageBox.warning(self, "Error", "Please fill all fields.")
             return
 
         # 2. Έλεγχος αν οι κωδικοί ταιριάζουν
         if password != confirm_pw:
-            QMessageBox.warning(self, "Error", "Passwords dont match!")
+            QMessageBox.warning(self, "Error", "Passwords don't match!")
             return
         
         users = classes.User(username, password, "Customer", firstName, surname, email, phoneNumber, licenseNumber, licenseType)
         response = functions.RegisterUser(users)
         if response:
             print(f"Signing up: {username}, {email}")
-            QMessageBox.information(self, "Success", "User created successfully!")
+            QMessageBox.information(self, "Success", "Account created successfully!")
             self.user_window = LoginWindow()
             self.user_window.show()
             self.close()
         else:
             print(f"Error Signing up user!")
-            QMessageBox.information(self, "Error!", "User not created!")
+            QMessageBox.information(self, "Error!", "Failed to create account!")
 
     def resizeEvent(self, event):
         if not self.original_pixmap.isNull():
@@ -221,7 +222,10 @@ class RegisterWindow(QWidget):
         else:
             line_edit.setEchoMode(QLineEdit.Password)
             action.setIcon(QIcon('assets/eye_hide.png'))
-    
+    def go_to_login(self):
+        self.login_window = LoginWindow()
+        self.login_window.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
