@@ -116,6 +116,7 @@ class ReservationsWindow(QMainWindow):
         self.nav_group.setExclusive(True)
 
         btn_dashboard = self.make_sidebar_button("Dashboard")
+        btn_dashboard.clicked.connect(self.forward_to_dashboard)
         btn_reservations = self.make_sidebar_button("Reservations", checked=True)
         btn_settings = self.make_sidebar_button("Settings")
         btn_logout = self.make_sidebar_button("Logout")
@@ -229,18 +230,11 @@ class ReservationsWindow(QMainWindow):
             background: transparent;
         """)
 
-        stats_row = QHBoxLayout()
-        stats_row.setSpacing(12)
-        stats_row.addWidget(self.make_stat_chip(f"{len(self.cars)} Cars"))
-        stats_row.addWidget(self.make_stat_chip("Available"))
-        stats_row.addStretch()
-
         banner_layout.addLayout(banner_top)
         banner_layout.addStretch()
         banner_layout.addWidget(title)
         banner_layout.addWidget(subtitle)
         banner_layout.addSpacing(8)
-        banner_layout.addLayout(stats_row)
 
         content_layout.addWidget(banner)
         
@@ -266,13 +260,6 @@ class ReservationsWindow(QMainWindow):
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
         toolbar_layout.setSpacing(12)
 
-        left_info = QLabel("Sort by: <b>Recommended</b>")
-        left_info.setStyleSheet("""
-            color: #2b3547;
-            font-size: 14px;
-            background: transparent;
-        """)
-
         self.right_info_label = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
         self.right_info_label.setStyleSheet("""
             color: #556070;
@@ -281,9 +268,6 @@ class ReservationsWindow(QMainWindow):
         """)
 
 
-    
-
-        toolbar_layout.addWidget(left_info)
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.right_info_label)
         content_layout.addWidget(toolbar)

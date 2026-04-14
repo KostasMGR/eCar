@@ -151,6 +151,7 @@ class MainDashboard(QMainWindow):
 
         btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
         btn_reservations = self.make_sidebar_button("Reservations")
+        btn_reservations.clicked.connect(self.reservations)
         btn_settings = self.make_sidebar_button("Settings")
         btn_logout = self.make_sidebar_button("Logout")
 
