@@ -8,7 +8,7 @@ from back_end import functions
 from PySide6.QtGui import QPixmap, QIcon
 
 
-class ReservationsWindow(QWidget):
+class ReservationsWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Car Rental - Reservations")
@@ -115,8 +115,8 @@ class ReservationsWindow(QWidget):
         self.nav_group = QButtonGroup(self)
         self.nav_group.setExclusive(True)
 
-        btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
-        btn_reservations = self.make_sidebar_button("Reservations")
+        btn_dashboard = self.make_sidebar_button("Dashboard")
+        btn_reservations = self.make_sidebar_button("Reservations", checked=True)
         btn_settings = self.make_sidebar_button("Settings")
         btn_logout = self.make_sidebar_button("Logout")
 
@@ -251,10 +251,10 @@ class ReservationsWindow(QWidget):
         btn_logout.clicked.connect(self.logout)
 
         #MainDashboard Button
-        btn_main_dashboard_window = QPushButton(" Dashboard")
-        btn_main_dashboard_window.setCursor(Qt.PointingHandCursor)
-        btn_main_dashboard_window.setMinimumHeight(46)
-        btn_main_dashboard_window.clicked.connect(self.main_dashboard_forward)
+        btn_dashboard = QPushButton(" Dashboard")
+        btn_dashboard.setCursor(Qt.PointingHandCursor)
+        btn_dashboard.setMinimumHeight(46)
+        btn_dashboard.clicked.connect(self.forward_to_dashboard)
 
 
         # Toolbar
@@ -280,36 +280,12 @@ class ReservationsWindow(QWidget):
             background: transparent;
         """)
 
-        btn_filter = QPushButton("Filter")
-        btn_filter.setEnabled(True)  # frontend only
-        btn_filter.clicked.connect(self.open_filters)
-        btn_filter.setStyleSheet("""
-        QPushButton {
-            background-color: #6a9a83; 
-            color: white; 
-            border-radius: 10px; 
-            padding: 10px 18px; 
-            font-weight: bold; 
-            font-size: 13px;
-            }
-            QPushButton:hover { 
-                background-color: #5a8571; 
-            }                
-            QPushButton:pressed {
-                background-color: #5a8571; 
-                padding-top: 12px;        
-                padding-bottom: 8px;       
-               
-            }
-        """)
 
     
 
         toolbar_layout.addWidget(left_info)
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.right_info_label)
-        toolbar_layout.addWidget(btn_filter)
-
         content_layout.addWidget(toolbar)
 
         # Scroll area
@@ -360,8 +336,8 @@ class ReservationsWindow(QWidget):
             if widget:
                 widget.deleteLater()
                 
-        if not cars_list:   # Filtered list is empty (no cars match the criteria           
-                no_cars_label = QLabel("No cars matched these criteria.")
+        if not cars_list:           
+                no_cars_label = QLabel("No reservations can be found.")
                 no_cars_label.setAlignment(Qt.AlignCenter)
                 no_cars_label.setStyleSheet("""
                     color: #8a94a6; 
@@ -389,25 +365,6 @@ class ReservationsWindow(QWidget):
                 col = 0
                 row += 1
         
-
-    def open_filters(self):
-        dialog = FilterDialog(self)
-        if dialog.exec():
-            try:
-                price, year, cc, hp = dialog.get_values()
-                
-                if all(v is None for v in [price, year, cc, hp]):
-                    filtered = functions.GetCars()
-                else:
-                    filtered = functions.FilterCars(price, year, cc, hp)
-                
-                if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
-                    self.update_grid(filtered)
-                else:
-                    print(f"functions.py den esteile thn lista {filtered}")
-                    self.update_grid([]) # an den esteile lista, emfanise keno
-            except ValueError:
-                print("Error please enter only numbers!")
           
     def logout(self):
         from login import LoginWindow
@@ -415,7 +372,7 @@ class ReservationsWindow(QWidget):
         self.login_window.show()
         self.close()      
 
-    def main_dashboard_forward(self):
+    def forward_to_dashboard(self):
         from main_user import MainDashboard
         self.main_dashboard_window = MainDashboard() 
         self.main_dashboard_window.show()
