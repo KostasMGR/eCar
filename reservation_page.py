@@ -7,45 +7,11 @@ from PySide6.QtCore import Qt
 from back_end import functions
 from PySide6.QtGui import QPixmap, QIcon
 
-class FilterDialog(QDialog):
-    def __init__(self, parent=None): 
-        super().__init__(parent)
-        self.setWindowTitle("Filter")
-        layout = QVBoxLayout(self)
 
-        form = QFormLayout()
-        self.price_input = QLineEdit()
-        self.year_input = QLineEdit()
-        self.cc_input = QLineEdit()
-        self.hp_input = QLineEdit()
-        
-        form.addRow("Max Price (€):", self.price_input)
-        form.addRow("Min Year:", self.year_input)
-        form.addRow("Min CC:", self.cc_input)
-        form.addRow("Min HP:", self.hp_input)
-        layout.addLayout(form)
-        
-        btn = QPushButton("Εφαρμογή")
-        btn.clicked.connect(self.accept)
-        layout.addWidget(btn)
-
-    def get_values(self):
-        p = self.price_input.text().strip()
-        y = self.year_input.text().strip()
-        cc = self.cc_input.text().strip()
-        hp = self.hp_input.text().strip()
-
-        return (
-            float(p) if p else None,
-            int(y) if y else None,
-            int(cc) if cc else None,
-            int(hp) if hp else None
-        )
-
-class MainDashboard(QMainWindow):
+class ReservationsWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Car Rental - Dashboard")
+        self.setWindowTitle("Car Rental - Reservations")
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
         
@@ -163,11 +129,6 @@ class MainDashboard(QMainWindow):
         sidebar_layout.addWidget(btn_settings)
         sidebar_layout.addStretch()
 
-        self.btn_reservations = QPushButton("Reservations")
-        self.btn_reservations.setCursor(Qt.PointingHandCursor)
-        self.btn_reservations.setMinimumHeight(46)
-        self.btn_reservations.clicked.connect(self.reservations)
-
         self.btn_logout = QPushButton("Logout")
         self.btn_logout.setCursor(Qt.PointingHandCursor)
         self.btn_logout.setMinimumHeight(46)
@@ -252,7 +213,7 @@ class MainDashboard(QMainWindow):
         banner_top.addWidget(section_badge)
         banner_top.addStretch()
 
-        title = QLabel("Available Cars")
+        title = QLabel("Reservations")
         title.setStyleSheet("""
             color: white;
             font-size: 34px;
@@ -260,7 +221,7 @@ class MainDashboard(QMainWindow):
             background: transparent;
         """)
 
-        subtitle = QLabel("Browse vehicles, view availability and continue to reservation.")
+        subtitle = QLabel("View and manage reservations and details.")
         subtitle.setStyleSheet("""
             color: rgba(255,255,255,0.88);
             font-size: 14px;
@@ -288,6 +249,12 @@ class MainDashboard(QMainWindow):
         btn_logout.setCursor(Qt.PointingHandCursor)
         btn_logout.setMinimumHeight(46)
         btn_logout.clicked.connect(self.logout)
+
+        #MainDashboard Button
+        btn_main_dashboard_window = QPushButton(" Dashboard")
+        btn_main_dashboard_window.setCursor(Qt.PointingHandCursor)
+        btn_main_dashboard_window.setMinimumHeight(46)
+        btn_main_dashboard_window.clicked.connect(self.main_dashboard_forward)
 
 
         # Toolbar
@@ -446,13 +413,13 @@ class MainDashboard(QMainWindow):
         from login import LoginWindow
         self.login_window = LoginWindow() 
         self.login_window.show()
-        self.close()    
+        self.close()      
 
-    def reservations(self):  
-        from reservation_page import ReservationsWindow
-        self.reservations_window = ReservationsWindow() 
-        self.reservations_window.show()
-        self.close()
+    def main_dashboard_forward(self):
+        from main_user import MainDashboard
+        self.main_dashboard_window = MainDashboard() 
+        self.main_dashboard_window.show()
+        self.close() 
 
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
@@ -707,6 +674,6 @@ class MainDashboard(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainDashboard()
+    window = ReservationsWindow()
     window.show()
     sys.exit(app.exec())
