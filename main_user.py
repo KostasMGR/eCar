@@ -240,19 +240,6 @@ class MainDashboard(QMainWindow):
         banner_top = QHBoxLayout()
         banner_top.setSpacing(10)
 
-        section_badge = QLabel("TRAVEL / RENTALS")
-        section_badge.setStyleSheet("""
-            background-color: rgba(255,255,255,0.16);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-        """)
-
-        banner_top.addWidget(section_badge)
-        banner_top.addStretch()
-
         title = QLabel("Available Cars")
         title.setStyleSheet("""
             color: white;
