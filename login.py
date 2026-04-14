@@ -4,10 +4,12 @@ from PySide6.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QFrame, QMessageBox
 )
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon, QAction
 from back_end import authentication as auth
 from main_user import MainDashboard
+from back_end.session import session
 
 
 class ResizableLogo(QLabel):
@@ -226,10 +228,11 @@ class LoginWindow(QWidget):
     def handle_login(self):
         email = self.email_input.text().strip()
         password = self.password_input.text().strip()
+
         response,message,role = auth.authenticate_user(email, password)
         print(response)
         if response:
-            self.user_window = MainDashboard()
+            self.user_window = MainDashboard(email)
             self.user_window.show()
             self.close()
         else:
