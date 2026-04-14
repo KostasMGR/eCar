@@ -1,6 +1,6 @@
 import mysql.connector
 from back_end import classes
-
+from  back_end import functions 
 
 
 def get_user_by_email(email):
@@ -10,12 +10,7 @@ def get_user_by_email(email):
     """
     try:
         # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
-        conn = mysql.connector.connect(
-            host="localhost", 
-            user="root",
-            password="", 
-            database="eCar_db"
-        )
+        conn,cursor = functions.ConnectDB()
         cursor = conn.cursor(dictionary=True)
         query = "SELECT user_id, email, user_password, user_role FROM users WHERE email = %s"
         cursor.execute(query, (email,))

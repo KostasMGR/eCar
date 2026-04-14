@@ -5,6 +5,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from back_end import functions
+from datetime import datetime
+
 from PySide6.QtGui import QPixmap, QIcon
 
 class FilterDialog(QDialog):
@@ -43,12 +45,12 @@ class FilterDialog(QDialog):
         )
 
 class MainDashboard(QMainWindow):
-    def __init__(self):
+    def __init__(self,session_email:str):
         super().__init__()
         self.setWindowTitle("Car Rental - Dashboard")
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
-        
+        self.session_email=session_email
         # Τραβάμε τα αυτοκίνητα
         db_cars = functions.GetCars()
 
@@ -412,6 +414,15 @@ class MainDashboard(QMainWindow):
         
 
     def open_filters(self):
+        #TODO handle dates and get car license
+        start = "2026-04-14 15:30"
+        st = datetime.strptime(start ,"%Y-%m-%d %H:%M")
+        end = "2026-04-16 16:30"
+        et = datetime.strptime(end ,"%Y-%m-%d %H:%M")
+        car = functions.GetCarByLicense("ABC1234")
+        functions.CreateReservation(self.session_email,start,end,car["car_id"])
+        reservation= function.GetUserReservations(self.session_email)
+        print("Reservation for the mail: ",reservation)
         dialog = FilterDialog(self)
         if dialog.exec():
             try:
@@ -694,6 +705,8 @@ class MainDashboard(QMainWindow):
         return card
 
 if __name__ == "__main__":
+    
+    functions.CreateReservation(MainDashboard.session_email)
     app = QApplication(sys.argv)
     window = MainDashboard()
     window.show()
