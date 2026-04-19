@@ -323,6 +323,20 @@ def GetCarByLicense(license:str):
         db.close()
         conn.close()
 
+def GetCarByID(ID:int):
+    try:
+        conn,db = ConnectDB()
+        query = "select * from cars where car_id=%s"
+        db.execute(query,(ID, ))
+        print("afer db execute\n")
+        car = db.fetchone()
+        return car
+    except mysql.connector.Error as err:
+        print(f"Error getting car by license plate: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
 
 def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
     user=GetUserSession(email)
@@ -331,13 +345,16 @@ def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
 
         conn, db = ConnectDB()
         user = GetUserSession(email)
+        car = GetCarByID(car_id)
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
         """ st_str = st.strftime("%Y-%m-%d %H:%M")
         et_str = et.strftime("%Y-%m-%d %H:%M") """
+        duration= et-st
+        rate= float(car["price"])
+        total_price=duration*rate
         print(st)
         print(et)
-        total_price = 100
         reservation_status=True
         query=query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
@@ -357,7 +374,7 @@ def GetUserReservations(email:str):
         query = "select * from reservations where user_id=%s"
         db.execute(query,(user["user_id"], ))
         print("after db execute\n")
-        reservation = db.fetchone()
+        reservation = db.fetchall()
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
