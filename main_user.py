@@ -54,7 +54,7 @@ class RentDetails(QDialog):
         self.btn_no = QPushButton("No")
         
         # Styling
-        self.btn_yes.setStyleSheet("background-color: #2563eb; color: white; padding: 8px; font-weight: bold;")
+        self.btn_yes.setStyleSheet("background-color: #1f9d55; color: white; padding: 8px; font-weight: bold;")
         self.btn_no.setStyleSheet("background-color: #ef4444; color: white; padding: 8px; font-weight: bold;")
         
         button_layout.addWidget(self.btn_yes)
