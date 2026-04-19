@@ -345,7 +345,7 @@ class ReservationsWindow(QMainWindow):
 
     def forward_to_dashboard(self):
         from main_user import MainDashboard
-        self.main_dashboard_window = MainDashboard() 
+        self.main_dashboard_window = MainDashboard(self.session_email) 
         self.main_dashboard_window.show()
         self.close() 
 
