@@ -1,12 +1,12 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget
 )
 from PySide6.QtCore import Qt
 from back_end import functions
 from datetime import datetime
-
+from reservation_page import ReservationsWindow
 from PySide6.QtGui import QPixmap, QIcon
 
 class FilterDialog(QDialog):
@@ -186,6 +186,7 @@ class MainDashboard(QMainWindow):
         self.nav_group.setExclusive(True)
 
         btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
+        btn_dashboard.clicked.connect(self.show_dashboard)
         btn_reservations = self.make_sidebar_button("Reservations")
         btn_reservations.clicked.connect(self.reservations)
         btn_settings = self.make_sidebar_button("Settings")
@@ -231,13 +232,20 @@ class MainDashboard(QMainWindow):
         # =========================
         # Main content
         # =========================
-        content = QWidget()
-        content.setStyleSheet("background-color: transparent;")
-        content_layout = QVBoxLayout(content)
+        # =========================
+        # Main content (Η Στοίβα με τις σελίδες)
+        # =========================
+        self.stacked_widget = QStackedWidget()
+        shell_layout.addWidget(self.stacked_widget)
+
+        # Κουτί για το Dashboard
+        self.dashboard_container = QWidget()
+        self.dashboard_container.setStyleSheet("background-color: transparent;")
+        content_layout = QVBoxLayout(self.dashboard_container) # Προσοχή, τώρα μπαίνει στο dashboard_container
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(0)
 
-        shell_layout.addWidget(content)
+ 
 
         btn_logout.setStyleSheet("""
             QPushButton {
@@ -405,11 +413,14 @@ class MainDashboard(QMainWindow):
 
         scroll.setWidget(scroll_content)
         content_layout.addWidget(scroll)
-       
+        # Φέρνουμε τη σελίδα των Reservations από το άλλο αρχείο
+        self.res_page = ReservationsWindow(self.session_email)
+        # Βάζουμε τις 2 σελίδες στο QStackedWidget (Στοίβα)
+        self.stacked_widget.addWidget(self.dashboard_container) # Index 0
+        self.stacked_widget.addWidget(self.res_page)            # Index 1
 
 
-        scroll.setWidget(scroll_content)
-        content_layout.addWidget(scroll)
+    
 
     def update_grid(self, cars_list):
         for i in reversed(range(self.grid.count())):
@@ -507,11 +518,11 @@ class MainDashboard(QMainWindow):
         self.close()    
 
     def reservations(self):  
-        from reservation_page import ReservationsWindow
-        self.reservations_window = ReservationsWindow(self.session_email) 
-        self.reservations_window.show()
-        self.close()
-
+        
+        self.stacked_widget.setCurrentIndex(1)
+    def show_dashboard(self):
+        
+        self.stacked_widget.setCurrentIndex(0)
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
         btn.setCheckable(True)

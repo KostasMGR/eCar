@@ -43,12 +43,9 @@ class DatePickerDialog(QDialog):
         start_str = self.start_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
         end_str = self.end_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
         return start_str, end_str
-class ReservationsWindow(QMainWindow):
+class ReservationsWindow(QWidget):
     def __init__(self,session_email:str):
         super().__init__()
-        self.setWindowTitle("Car Rental - Reservations")
-        self.setWindowIcon(QIcon('assets/icon.png'))
-        self.resize(1280, 820)
         self.session_email=session_email
         # Τραβάμε τα αυτοκίνητα
         #db_cars = functions.GetUserReservations(session_email)
@@ -58,162 +55,17 @@ class ReservationsWindow(QMainWindow):
         else:
             self.cars = []
 
-        outer = QWidget()
-        self.setCentralWidget(outer)
-        outer_layout = QVBoxLayout(outer)
-        outer_layout.setContentsMargins(18, 18, 18, 18)
-        outer_layout.setSpacing(0)
-
-        outer.setStyleSheet("""
-            QWidget {
-                background: qlineargradient(
-                    x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #3a5a54,
-                    stop:0.5 #2d3e3a,
-                    stop:1 #4a6d64
-                );
-            }
-        """)
-
-        app_shell = QFrame()
-        app_shell.setObjectName("AppShell")
-        app_shell.setStyleSheet("""
-            QFrame#AppShell {
-                background-color: #f0f4f3;
-                border-radius: 20px;
-            }
-        """)
-
-        shell_layout = QHBoxLayout(app_shell)
-        shell_layout.setContentsMargins(0, 0, 0, 0)
-        shell_layout.setSpacing(0)
-
-        outer_layout.addWidget(app_shell)
-
-        # =========================
-        # Sidebar
-        # =========================
-        sidebar = QFrame()
-        sidebar.setFixedWidth(220)
-        sidebar.setStyleSheet("""
-            QFrame {
-                background-color: #1a2b27;
-                border-top-left-radius: 20px;
-                border-bottom-left-radius: 20px;
-            }
-            QLabel {
-                background: transparent;
-            }
-            QPushButton {
-                text-align: left;
-                padding: 14px 22px;
-                border: none;
-                font-size: 14px;
-                font-weight: 600;
-                color: #a3c9b8;
-                background: transparent;
-                border-left: 4px solid transparent;
-            }
-            QPushButton:hover {
-                background-color: #243a34;
-                color: white;
-            }
-            QPushButton:checked {
-                background-color: #2d3e3a;
-                color: white;
-                border-left: 4px solid #6a9a83;
-            }   
-        """)
         
-        sidebar_layout = QVBoxLayout(sidebar)
-        sidebar_layout.setContentsMargins(0, 22, 0, 18)
-        sidebar_layout.setSpacing(6)
-        
-
-        logo_wrap = QWidget()
-        logo_layout = QVBoxLayout(logo_wrap)
-        logo_layout.setContentsMargins(18, 0, 18, 10)
-        logo_layout.setSpacing(2)
-
-        logo = QLabel("eCar Rental")
-        logo.setStyleSheet("""
-            color: white;
-            font-size: 24px;
-            font-weight: 800;
-        """)
-
-       
-
-        logo_layout.addWidget(logo)
-        sidebar_layout.addWidget(logo_wrap)
-
-        self.nav_group = QButtonGroup(self)
-        self.nav_group.setExclusive(True)
-
-        btn_dashboard = self.make_sidebar_button("Dashboard")
-        btn_dashboard.clicked.connect(self.forward_to_dashboard)
-        btn_reservations = self.make_sidebar_button("Reservations", checked=True)
-        btn_settings = self.make_sidebar_button("Settings")
-        btn_logout = self.make_sidebar_button("Logout")
-
-        self.nav_group.addButton(btn_dashboard)
-        self.nav_group.addButton(btn_reservations)
-        self.nav_group.addButton(btn_settings)
-
-        sidebar_layout.addWidget(btn_dashboard)
-        sidebar_layout.addWidget(btn_reservations)
-        sidebar_layout.addWidget(btn_settings)
-        sidebar_layout.addStretch()
-
-        self.btn_logout = QPushButton("Logout")
-        self.btn_logout.setCursor(Qt.PointingHandCursor)
-        self.btn_logout.setMinimumHeight(46)
-        self.btn_logout.clicked.connect(self.logout)
-        self.btn_logout.setStyleSheet("""
-            QPushButton {
-                text-align: left;
-                padding: 14px 22px;
-                border: none;
-                font-size: 14px;
-                font-weight: 600;
-                color: #ff9999;
-                background: transparent;
-            }
-            QPushButton:hover {
-                background-color: #3d2424;
-                color: #ff4444;
-            }
-        """)
-        sidebar_layout.addWidget(self.btn_logout)
-
-        shell_layout.addWidget(sidebar)
 
         # =========================
         # Main content
         # =========================
-        content = QWidget()
-        content.setStyleSheet("background-color: transparent;")
-        content_layout = QVBoxLayout(content)
+        
+        content_layout = QVBoxLayout(self)
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(0)
 
-        shell_layout.addWidget(content)
-
-        btn_logout.setStyleSheet("""
-            QPushButton {
-                text-align: left;
-                padding: 14px 22px;
-                border: none;
-                font-size: 14px;
-                font-weight: 600;
-                color: #ff9999;
-                background: transparent;
-            }
-            QPushButton:hover {
-                background-color: #3d2424;
-                color: #ff4444;
-            }
-        """)
+    
 
         # Banner
         banner = QFrame()
@@ -341,18 +193,7 @@ class ReservationsWindow(QMainWindow):
                 background-color: #4a6d64;
             }
         """)
-        toolbar_layout.addWidget(self.btn_pick_dates) # Προσθήκη στο toolbardef open_date_picker(self):
-        dialog = DatePickerDialog(self)
-        if dialog.exec() == QDialog.Accepted:
-            start_date, end_date = dialog.get_dates()
-            
-            # Εδώ έχεις τις ημερομηνίες έτοιμες για το st = datetime.strptime(...)
-            print(f"Selected Start: {start_date}")
-            print(f"Selected End: {end_date}")
-            
-            # Μπορείς να ενημερώσεις το UI ή να φιλτράρεις τα αυτοκίνητα
-            self.btn_pick_dates.setText(f"📅 {start_date} to {end_date}")
-        
+        toolbar_layout.addWidget(self.btn_pick_dates)
         toolbar_layout.addStretch()
         # ...
 
