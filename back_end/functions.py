@@ -374,7 +374,7 @@ def GetUserReservations(email:str):
         query = "select * from reservations where user_id=%s"
         db.execute(query,(user["user_id"], ))
         print("after db execute\n")
-        reservation = db.fetchone()
+        reservation = db.fetchall()
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
