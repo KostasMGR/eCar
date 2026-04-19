@@ -51,8 +51,8 @@ class ReservationsWindow(QMainWindow):
         self.resize(1280, 820)
         self.session_email=session_email
         # Τραβάμε τα αυτοκίνητα
+        #db_cars = functions.GetUserReservations(session_email)
         db_cars = functions.GetCars()
-
         if db_cars:
             self.cars = db_cars
         else:
@@ -632,13 +632,11 @@ class ReservationsWindow(QMainWindow):
             }
         """)
 
-        btn_select = QPushButton("Select")
-        btn_select.setCursor(Qt.PointingHandCursor)
-
-        if car["state"] == "Available":
-            btn_select.setStyleSheet("""
+        btn_cancel = QPushButton("Cancel")
+        btn_cancel.setCursor(Qt.PointingHandCursor)
+        btn_cancel.setStyleSheet("""
                 QPushButton {
-                    background-color: #2563eb;
+                    background-color: #ef4444;
                     color: white;
                     border: none;
                     border-radius: 10px;
@@ -647,20 +645,7 @@ class ReservationsWindow(QMainWindow):
                     font-weight: 800;
                 }
                 QPushButton:hover {
-                    background-color: #1d4ed8;
-                }
-            """)
-        else:
-            btn_select.setEnabled(False)
-            btn_select.setStyleSheet("""
-                QPushButton {
-                    background-color: #dbe3ef;
-                    color: #7b8795;
-                    border: none;
-                    border-radius: 10px;
-                    padding: 10px 18px;
-                    font-size: 13px;
-                    font-weight: 800;
+                    background-color: #ff9999;
                 }
             """)
 
@@ -675,7 +660,7 @@ class ReservationsWindow(QMainWindow):
         bottom_row.addWidget(btn_details)
         bottom_row.addStretch()
         bottom_row.addWidget(price_label) 
-        bottom_row.addWidget(btn_select)
+        bottom_row.addWidget(btn_cancel)
 
         layout.addLayout(top_row)
         layout.addWidget(image_box)
