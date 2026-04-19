@@ -30,6 +30,18 @@ class FilterDialog(QDialog):
         btn = QPushButton("Apply")
         btn.clicked.connect(self.accept)
         layout.addWidget(btn)
+        def get_values(self):
+            p = self.price_input.text().strip()
+            y = self.year_input.text().strip()
+            cc = self.cc_input.text().strip()
+            hp = self.hp_input.text().strip()
+
+            return (
+                float(p) if p else None,
+                int(y) if y else None,
+                int(cc) if cc else None,
+                int(hp) if hp else None
+            )
 class RentDetails(QDialog):
     def __init__(self, total_price, parent=None): 
         super().__init__(parent)
@@ -65,18 +77,6 @@ class RentDetails(QDialog):
         # Connections
         self.btn_yes.clicked.connect(self.accept) # Κλείνει το dialog με True
         self.btn_no.clicked.connect(self.reject)  # Κλείνει το dialog με False
-    def get_values(self):
-        p = self.price_input.text().strip()
-        y = self.year_input.text().strip()
-        cc = self.cc_input.text().strip()
-        hp = self.hp_input.text().strip()
-
-        return (
-            float(p) if p else None,
-            int(y) if y else None,
-            int(cc) if cc else None,
-            int(hp) if hp else None
-        )
 
 class MainDashboard(QMainWindow):
     def __init__(self,session_email:str):
