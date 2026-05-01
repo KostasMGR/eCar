@@ -555,7 +555,18 @@ class MainDashboard(QMainWindow):
             font-weight: 700;
         """)
         return chip
-
+    def handle_rent(self, car):
+        from reservation_page import DatePickerDialog 
+        
+        date_dialog = DatePickerDialog(self)
+        if date_dialog.exec() == QDialog.Accepted:
+            start_str, end_str = date_dialog.get_dates()
+            
+            # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
+            from pay import PaymentWindow
+            self.payment_screen = PaymentWindow(self.session_email, car, start_str, end_str)
+            self.payment_screen.show()
+            self.close() # Κλείνουμε το dashboard όσο πληρώνει
     def create_car_card(self, car):
         card = QFrame()
         card.setMinimumHeight(360)
