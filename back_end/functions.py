@@ -9,7 +9,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
+            password="8716",
             database="eCar_db"
         )
         
@@ -323,7 +323,7 @@ def GetCarByLicense(license:str):
         db.close()
         conn.close()
 
-def GetCarByID(ID:int):
+def GetCarbyID(ID:str):
     try:
         conn,db = ConnectDB()
         query = "select * from cars where car_id=%s"
@@ -338,25 +338,28 @@ def GetCarByID(ID:int):
         db.close()
         conn.close()
 
-def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
-    user=GetUserSession(email)
-    print("From functions: ",user["user_id"])
+def CreateReservation(email:str,start_date, end_date,car_id):
+    
     try:
-
         conn, db = ConnectDB()
         user = GetUserSession(email)
-        car = GetCarByID(car_id)
+        car=GetCarbyID(car_id)
+       # car = GetCarByLicense(car_plate)
+        #print("the car id is: "+car['car_id'])
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
         """ st_str = st.strftime("%Y-%m-%d %H:%M")
         et_str = et.strftime("%Y-%m-%d %H:%M") """
-        duration= et-st
+        duration = (et - st).days
+        print("Duration is: ",duration)
         rate= float(car["price"])
         total_price=duration*rate
+        print("Total price is: ", total_price)
         print(st)
         print(et)
+        print("User id ", user["user_id"])
         reservation_status=True
-        query=query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
+        query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
         conn.commit()
         return True

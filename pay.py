@@ -4,12 +4,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QFrame, QMessageBox, QHBoxLayout)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
-
+from back_end import classes
 class PaymentWindow(QWidget):
-    def __init__(self, session_email, car_data, start_date, end_date):
+    #            self.payment_screen = PaymentWindow(self.session_email, start_str, end_str, car)
+
+    def __init__(self, session_email,start_date, end_date, car):
         super().__init__()
         self.session_email = session_email
-        self.car_data = car_data
+        self.car_data = car
         self.start_date = start_date
         self.end_date = end_date
         
@@ -18,7 +20,7 @@ class PaymentWindow(QWidget):
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
         days = max((et - st).days, 1)
-        self.total_amount = days * car_data['price']
+        self.total_amount = days * self.car_data['price']
 
         self.setWindowTitle("Car Rental - Secure Payment")
         self.setWindowIcon(QIcon('assets/icon.png'))
@@ -51,12 +53,12 @@ class PaymentWindow(QWidget):
         card_layout.setContentsMargins(30, 30, 30, 30)
 
         # Summary Info
-        summary = QLabel(f"Total to Pay: <b>€{self.total_amount}</b><br><small>Vehicle: {car_data['brand']} {car_data['model']}</small>")
+        summary = QLabel(f"Total to Pay: <b>€{self.total_amount}</b><br><small>Vehicle: {self.car_data['brand']} {self.car_data['model']}</small>")
         summary.setAlignment(Qt.AlignCenter)
         summary.setStyleSheet("color: #1e293b; font-size: 16px; margin-bottom: 10px;")
         card_layout.addWidget(summary)
 
-        input_style = "QLineEdit { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 14px; }"
+        input_style = "QLineEdit { background: white; color: black; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 14px; }"
         header_style = "color: #64748b; font-size: 11px; font-weight: bold;"
 
         # Fields
@@ -112,7 +114,11 @@ class PaymentWindow(QWidget):
         from back_end import functions
         try:
             # Εκτέλεση κράτησης αφού η "πληρωμή" πέτυχε
-            functions.CreateReservation(self.session_email, self.start_date, self.end_date, self.car_data["car_id"])
+            print("Car ID: "+ str(self.car_data['car_id']))
+            #car_id = functions.GetCarbyID(self.car_data)
+            #print("Car id from pay: " , car_id)
+           # car_id = functions.GetCarIDByLicense(self.car["license_plate"])
+            functions.CreateReservation(self.session_email, self.start_date, self.end_date, str(self.car_data['car_id']))
             QMessageBox.information(self, "Success", "Payment Successful! Your car is reserved.")
             self.go_to_main()
         except Exception as e:

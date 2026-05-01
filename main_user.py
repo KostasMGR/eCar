@@ -457,33 +457,7 @@ class MainDashboard(QMainWindow):
                 col = 0
                 row += 1
         
-    def handle_rent(self, car):
-        # 1. Πρέπει πρώτα να διαλέξει ημερομηνίες (χρησιμοποιούμε το Dialog από πριν)
-        from reservation_page import DatePickerDialog # Αν το έχεις εκεί
-        
-        date_dialog = DatePickerDialog(self)
-        if date_dialog.exec() == QDialog.Accepted:
-            start_str, end_str = date_dialog.get_dates()
-            
-            # Υπολογισμός ημερών (απλό παράδειγμα)
-            st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
-            et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
-            days = (et - st).days
-            if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
-            
-            total_price = days * car['price']
-
-            # 2. Εμφάνιση του RentDetails Dialog
-            confirm_dialog = RentDetails(total_price, self)
-            if confirm_dialog.exec() == QDialog.Accepted:
-                # 3. Αν πατήσει Yes, κάνουμε την κράτηση
-                try:
-                    functions.CreateReservation(self.session_email, start_str, end_str, car["car_id"])
-                    print(f"Κράτηση επιτυχής για το {car['brand']}!")
-                    # Προαιρετικά: Άνοιξε τη σελίδα των κρατήσεων
-                    self.reservations()
-                except Exception as e:
-                    print(f"Σφάλμα κατά την κράτηση: {e}")
+ 
     def open_filters(self):
         #TODO handle dates and get car license
         start = "2026-04-14 15:30"
@@ -555,16 +529,22 @@ class MainDashboard(QMainWindow):
             font-weight: 700;
         """)
         return chip
-    def handle_rent(self, car):
+    def handle_rent(self, car): #NEW FUNC 
         from reservation_page import DatePickerDialog 
-        
+        #def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
         date_dialog = DatePickerDialog(self)
         if date_dialog.exec() == QDialog.Accepted:
             start_str, end_str = date_dialog.get_dates()
+            st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
+            et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
+            days = (et - st).days
+            if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
             
+            total_price = days * car['price']
             # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
             from pay import PaymentWindow
-            self.payment_screen = PaymentWindow(self.session_email, car, start_str, end_str)
+            print("Car plate from main: ", car['license_plate'])
+            self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
             self.payment_screen.show()
             self.close() # Κλείνουμε το dashboard όσο πληρώνει
     def create_car_card(self, car):
