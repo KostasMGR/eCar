@@ -369,7 +369,6 @@ def CreateReservation(email:str,start_date, end_date,car_id):
     finally:
         db.close()
         conn.close()   
-
 def GetUserReservations(email:str):
     try:
         conn,db = ConnectDB()
@@ -385,4 +384,66 @@ def GetUserReservations(email:str):
     finally:
         db.close()
         conn.close()
+def UpdateUserRole(email: str, new_role: str):
+    try:
+        conn, db = ConnectDB()
+        query = "UPDATE users SET user_role = %s WHERE email = %s"
+        db.execute(query, (new_role, email))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την αλλαγή ρόλου: {err}")
+        return False
+    finally:
+        db.close()
+        conn.close()
+def DeleteUserByEmail(email: str):
+    try:
+        conn, db = ConnectDB()
+        # Διαγραφή του χρήστη βάσει email
+        query = "DELETE FROM users WHERE email = %s"
+        db.execute(query, (email,))
+        conn.commit()
+        
+        # Ελέγχουμε αν όντως διαγράφηκε κάποια γραμμή
+        if db.rowcount > 0:
+            print(f"User {email} deleted successfully from database.")
+            return True
+        else:
+            print(f"User {email} not found.")
+            return False
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά τη διαγραφή χρήστη: {err}")
+        return False
+    finally:
+        db.close()
+        conn.close()
+
+def ChangePassword(user: classes.User, new_password: str):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckUserExists(user):
+            print("User doesn't exist")  
+            return False
+        
+        query="update users set user_password=%s where username=%s"
+        db.execute(query, (new_password,user.username))
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
