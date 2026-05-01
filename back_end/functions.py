@@ -366,7 +366,6 @@ def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
     finally:
         db.close()
         conn.close()   
-
 def GetUserReservations(email:str):
     try:
         conn,db = ConnectDB()
@@ -382,4 +381,16 @@ def GetUserReservations(email:str):
     finally:
         db.close()
         conn.close()
-
+def UpdateUserRole(email: str, new_role: str):
+    try:
+        conn, db = ConnectDB()
+        query = "UPDATE users SET user_role = %s WHERE email = %s"
+        db.execute(query, (new_role, email))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την αλλαγή ρόλου: {err}")
+        return False
+    finally:
+        db.close()
+        conn.close()

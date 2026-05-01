@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtWidgets import QComboBox
 
 from back_end import functions
 
@@ -168,13 +169,11 @@ class AdminWindow(QMainWindow):
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.create_banner("Manage Users", "View and moderate registered accounts."))
 
-        # Αυξάνουμε τις στήλες σε 5 για να χωρέσει το νέο κουμπί
         self.user_table = QTableWidget(0, 5)
-        self.user_table.setHorizontalHeaderLabels(["ID", "Full Name", "Email", "Role", "Actions"])
+        self.user_table.setHorizontalHeaderLabels(["ID", "Full Name", "Email", "Role Selection", "Actions"])
         self.user_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.user_table.setStyleSheet("QTableWidget { background: white; border: none; }")
+        self.user_table.setStyleSheet("QTableWidget { background: white; border: none; color: black; }")
         
-        # Ανάκτηση πραγματικών δεδομένων από τη βάση
         users_data = functions.GetUsers() 
         
         if users_data:
@@ -183,41 +182,46 @@ class AdminWindow(QMainWindow):
                 self.user_table.setItem(row_idx, 0, QTableWidgetItem(str(user['user_id'])))
                 self.user_table.setItem(row_idx, 1, QTableWidgetItem(f"{user['first_name']} {user['surname']}"))
                 self.user_table.setItem(row_idx, 2, QTableWidgetItem(user['email']))
-                self.user_table.setItem(row_idx, 3, QTableWidgetItem(user['user_role']))
                 
-                # Layout για τα κουμπιά στη στήλη Actions
+                # --- ΔΗΜΙΟΥΡΓΙΑ COMBOBOX (SCROLLER) ΓΙΑ ΤΟ ΡΟΛΟ ---
+                role_combo = QComboBox()
+                roles = ["Customer", "Dealer", "Admin"]
+                role_combo.addItems(roles)
+                # Θέτουμε την τρέχουσα τιμή βάσει της βάσης δεδομένων
+                role_combo.setCurrentText(user['user_role'])
+                role_combo.setStyleSheet("color: black; padding: 5px;")
+                self.user_table.setCellWidget(row_idx, 3, role_combo)
+                
+                # --- ACTIONS LAYOUT ---
                 actions_widget = QWidget()
                 actions_layout = QHBoxLayout(actions_widget)
                 actions_layout.setContentsMargins(2, 2, 2, 2)
+
+                # ΚΟΥΜΠΙ APPLY
+                btn_apply = QPushButton("Apply")
+                btn_apply.setStyleSheet("background: #3b82f6; color: white; border-radius: 5px; padding: 5px;")
+                # Σύνδεση με τη νέα μέθοδο apply_role_change
+                btn_apply.clicked.connect(lambda ch, e=user['email'], c=role_combo: self.apply_role_change(e, c))
 
                 # Κουμπί Delete
                 btn_del = QPushButton("Delete")
                 btn_del.setStyleSheet("background: #ef4444; color: white; border-radius: 5px; padding: 5px;")
                 btn_del.clicked.connect(lambda ch, r=row_idx: self.delete_user(r))
-                
-                # ΚΟΥΜΠΙ MAKE ADMIN
-                btn_admin = QPushButton("Make Admin")
-                btn_admin.setStyleSheet("background: #10b981; color: white; border-radius: 5px; padding: 5px;")
-                # Σύνδεση με τη νέα μέθοδο promote_to_admin
-                btn_admin.clicked.connect(lambda ch, e=user['email'], r=row_idx: self.promote_to_admin(e, r))
 
-                actions_layout.addWidget(btn_admin)
+                actions_layout.addWidget(btn_apply)
                 actions_layout.addWidget(btn_del)
                 self.user_table.setCellWidget(row_idx, 4, actions_widget)
 
         layout.addWidget(self.user_table)
         return page
-    def promote_to_admin(self, email, row):
-        # Κλήση της συνάρτησης από το functions.py[cite: 2]
-        success = functions.GiveAdminAccess(email)
+    def apply_role_change(self, email, combo_box):
+        new_role = combo_box.currentText()
+        success = functions.UpdateUserRole(email, new_role) # Καλεί τη νέα συνάρτηση
         
         if success:
-            print(f"User {email} is now an Admin.")
-            # Ενημέρωση του UI στη στήλη "Role" (στήλη 3)
-            self.user_table.setItem(row, 3, QTableWidgetItem("Admin"))
-            # Προαιρετικά: Απενεργοποίηση του κουμπιού αφού έγινε ήδη admin
+            print(f"Successfully updated {email} to {new_role}")
         else:
-            print(f"Failed to promote user {email}.")
+            print(f"Failed to update role for {email}")
     def create_logs_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
