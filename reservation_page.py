@@ -445,6 +445,7 @@ class ReservationsWindow(QWidget):
         """)
 
         btn_cancel = QPushButton("Cancel")
+        btn_cancel.clicked.connect(lambda: self.cancel_reservation(self.reservation['reservation_id']))
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
                 QPushButton {
@@ -482,7 +483,16 @@ class ReservationsWindow(QWidget):
         layout.addLayout(bottom_row)
 
         return card
-
+    def cancel_reservation(self, res_id):
+        success = functions.DeleteReservation(res_id)
+        
+        if success:
+            print(f"Reservation {res_id} deleted.")
+            # Refresh the UI by fetching the updated list
+            updated_list = functions.GetUserReservations(self.session_email)
+            self.update_grid(updated_list if updated_list else [])
+        else:
+            print("Failed to cancel reservation.")
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ReservationsWindow(None)
