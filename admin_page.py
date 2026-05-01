@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QFrame, QTableWidget, 
-    QTableWidgetItem, QHeaderView, QStackedWidget, QButtonGroup
+    QTableWidgetItem, QHeaderView, QStackedWidget, QButtonGroup, QMessageBox
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
@@ -250,23 +250,23 @@ class AdminWindow(QMainWindow):
             
         email = email_item.text()
         
-        # Προαιρετικό: Προσθήκη επιβεβαίωσης πριν τη διαγραφή
-        # (Χρειάζεται import QMessageBox από PySide6.QtWidgets)
-        
-        # 2. Κλήση της συνάρτησης διαγραφής από το back-end[cite: 6]
-        success = functions.DeleteUserByEmail(email)
-        
-        if success:
-            # 3. Αφαίρεση της σειράς από το QTableWidget οπτικά
-            self.user_table.removeRow(row)
-            print(f"Successfully removed {email} from UI.")
+        confirm = QMessageBox.question(
+            self,
+            "Confirm Deletion",
+            f"Are you sure you want to delete user {email}?\nThis action cannot be undone.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if confirm == QMessageBox.Yes:
+            success = functions.DeleteUserByEmail(email)
             
-            # ΣΗΜΑΝΤΙΚΟ: Μετά τη διαγραφή μιας σειράς, τα row indexes των επόμενων 
-            # σειρών αλλάζουν. Για να αποφύγεις bugs, μπορείς να ξανακαλέσεις 
-            # τη μέθοδο που γεμίζει τον πίνακα αν υπάρχουν πολλοί χρήστες.
-            # self.create_users_page() 
-        else:
-            print(f"Failed to delete user {email} from database.")
+            if success:
+                self.user_table.removeRow(row)
+                print(f"Successfully removed {email} from UI.")
+                QMessageBox.information(self, "Deleted", f"User {email} has been deleted.")
+            else:
+                QMessageBox.critical(self, "Error", f"Failed to delete user {email} from database.")
 
     def logout(self):
         from login import LoginWindow
