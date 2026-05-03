@@ -474,7 +474,7 @@ class MainDashboard(QMainWindow):
         et = datetime.strptime(end ,"%Y-%m-%d %H:%M")
         car = functions.GetCarByLicense("ABC1234")
         functions.CreateReservation(self.session_email,start,end,car["car_id"])
-        reservation= function.GetUserReservations(self.session_email)
+        reservation= functions.GetUserReservations(self.session_email)
         print("Reservation for the mail: ",reservation)
         dialog = FilterDialog(self)
         if dialog.exec():
