@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox
 )
 from PySide6.QtCore import Qt
 from back_end import functions
@@ -333,12 +333,60 @@ class MainDashboard(QMainWindow):
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
         toolbar_layout.setSpacing(12)
 
-        left_info = QLabel("Sort by: <b>Recommended</b>")
-        left_info.setStyleSheet("""
+        sort_label = QLabel("Sort by:")
+        sort_label.setStyleSheet("""
             color: #2b3547;
             font-size: 14px;
+            font-weight: 700;
             background: transparent;
         """)
+
+        self.sort_combo = QComboBox()
+
+        self.sort_combo.view().setStyleSheet("""
+            background-color: white;
+            color: #2b3547;
+            border: 1px solid #d1ddd9;
+            selection-background-color: #6a9a83;
+            selection-color: white;
+        """)
+        self.sort_combo.addItems([
+            "Price: Low to High",
+            "Price: High to Low",
+            "Year: Newest First",
+            "Year: Oldest First",
+            "CC: Low to High",
+            "CC: High to Low"
+        ])
+        self.sort_combo.setPlaceholderText("Recommended")
+        self.sort_combo.setCurrentIndex(-1)
+        self.sort_combo.setMinimumHeight(38)
+        self.sort_combo.setCursor(Qt.PointingHandCursor)
+
+        self.sort_combo.setStyleSheet("""
+            QComboBox {
+                background-color: white;
+                color: #2b3547;
+                border: 1px solid #d1ddd9;
+                border-radius: 10px;
+                padding: 8px 12px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+            QComboBox:hover {
+                border: 1px solid #6a9a83;
+            }
+            QComboBox QAbstractItemView {
+                background-color: white;
+                color: #2b3547;
+                border: 1px solid #d1ddd9;
+                selection-background-color: #6a9a83;
+                selection-color: white;
+                outline: none;
+            }
+        """)
+
+        
 
         self.right_info_label = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
         self.right_info_label.setStyleSheet("""
@@ -369,10 +417,12 @@ class MainDashboard(QMainWindow):
                
             }
         """)
+        self.sort_combo.currentTextChanged.connect(self.apply_sort)
 
     
 
-        toolbar_layout.addWidget(left_info)
+        toolbar_layout.addWidget(sort_label)
+        toolbar_layout.addWidget(self.sort_combo)
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.right_info_label)
         toolbar_layout.addWidget(btn_filter)
@@ -461,18 +511,42 @@ class MainDashboard(QMainWindow):
             if col > 2:
                 col = 0
                 row += 1
-        
- 
+    def apply_sort(self):
+        selected_sort = self.sort_combo.currentText()
+
+        if not selected_sort:
+            return
+
+        if selected_sort == "Price: Low to High":
+            sorted_cars = functions.GetSortedCars("price", descending=False)
+
+        elif selected_sort == "Price: High to Low":
+            sorted_cars = functions.GetSortedCars("price", descending=True)
+
+        elif selected_sort == "Year: Newest First":
+            sorted_cars = functions.GetSortedCars("year", descending=True)
+
+        elif selected_sort == "Year: Oldest First":
+            sorted_cars = functions.GetSortedCars("year", descending=False)
+
+        elif selected_sort == "CC: Low to High":
+            sorted_cars = functions.GetSortedCars("cc", descending=False)
+
+        elif selected_sort == "CC: High to Low":
+            sorted_cars = functions.GetSortedCars("cc", descending=True)
+
+        else:
+            return
+
+        if isinstance(sorted_cars, list):
+            self.update_grid(sorted_cars)
+            self.right_info_label.setText(f"Showing <b>{len(sorted_cars)}</b> vehicles")
+        else:
+            print(f"functions.py did not return a list: {sorted_cars}")
+            self.update_grid([])
+            self.right_info_label.setText("Showing <b>0</b> vehicles")    
+    
     def open_filters(self):
-        #TODO handle dates and get car license
-        start = "2026-04-14 15:30"
-        st = datetime.strptime(start ,"%Y-%m-%d %H:%M")
-        end = "2026-04-16 16:30"
-        et = datetime.strptime(end ,"%Y-%m-%d %H:%M")
-        car = functions.GetCarByLicense("ABC1234")
-        functions.CreateReservation(self.session_email,start,end,car["car_id"])
-        reservation= functions.GetUserReservations(self.session_email)
-        print("Reservation for the mail: ",reservation)
         dialog = FilterDialog(self)
         if dialog.exec():
             try:

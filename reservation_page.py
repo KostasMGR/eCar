@@ -196,8 +196,6 @@ class ReservationsWindow(QWidget):
        
 
 
-        scroll.setWidget(scroll_content)
-        content_layout.addWidget(scroll)
     def open_date_picker(self):
 
         dialog = DatePickerDialog(self)

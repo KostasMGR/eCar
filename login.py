@@ -2,7 +2,7 @@ import sys
 import mysql.connector
 from PySide6.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit, QPushButton,
-    QVBoxLayout, QFrame, QMessageBox
+    QVBoxLayout, QFrame, QMessageBox, QComboBox
 )
 
 from PySide6.QtCore import Qt
