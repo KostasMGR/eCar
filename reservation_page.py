@@ -312,7 +312,7 @@ class ReservationsWindow(QWidget):
         title = QLabel(f"{car['brand']} {car['model']}")
         title.setStyleSheet("""
             color: #1d2736;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             border: none;
         """)
@@ -328,34 +328,8 @@ class ReservationsWindow(QWidget):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        status_badge = QLabel(car["state"])
-        if car["state"] == "Available":
-            status_style = """
-                background-color: #eafaf0;
-                color: #1f9d55;
-            """
-        elif car["state"] == "Reserved":
-            status_style = """
-                background-color: #fff4e6;
-                color: #d97706;
-            """
-        else:
-            status_style = """
-                background-color: #ffe9e9;
-                color: #dc2626;
-            """
-
-        status_badge.setStyleSheet(f"""
-            {status_style}
-            padding: 6px 10px;
-            border-radius: 11px;
-            font-size: 11px;
-            font-weight: 800;
-        """)
-
         top_row.addLayout(name_wrap)
         top_row.addStretch()
-        top_row.addWidget(status_badge)
 
         image_box = QFrame()
         image_box.setFixedHeight(140) 
@@ -467,7 +441,7 @@ class ReservationsWindow(QWidget):
             """)
         res = functions.GetReservationByCarID(car["car_id"],self.session_email)
         print(res)
-        price_label = QLabel(f"€{res['total_price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ total</span>")
+        price_label = QLabel(f"€{res['total_price']} <span style='color: #6b7788; font-size: 18px; font-weight: 500;'>Total</span>")
         price_label.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
@@ -484,7 +458,6 @@ class ReservationsWindow(QWidget):
         layout.addWidget(image_box)
         layout.addLayout(chips_row)
         layout.addLayout(info_wrap)
-        layout.addStretch()
         layout.addLayout(bottom_row)
 
         return card

@@ -505,47 +505,17 @@ class MainDashboard(QMainWindow):
         row = 0
         col = 0
         for car in cars_list:
-            card = self.create_car_card(car)
-            self.grid.addWidget(card, row, col)
-            col += 1
-            if col > 2:
-                col = 0
-                row += 1
-    def apply_sort(self):
-        selected_sort = self.sort_combo.currentText()
+            if car['state'] == 'Available':
+                card = self.create_car_card(car)
+                self.grid.addWidget(card, row, col)
+                col += 1
+                if col > 2:
+                    col = 0
+                    row += 1
+        
 
-        if not selected_sort:
-            return
-
-        if selected_sort == "Price: Low to High":
-            sorted_cars = functions.GetSortedCars("price", descending=False)
-
-        elif selected_sort == "Price: High to Low":
-            sorted_cars = functions.GetSortedCars("price", descending=True)
-
-        elif selected_sort == "Year: Newest First":
-            sorted_cars = functions.GetSortedCars("year", descending=True)
-
-        elif selected_sort == "Year: Oldest First":
-            sorted_cars = functions.GetSortedCars("year", descending=False)
-
-        elif selected_sort == "CC: Low to High":
-            sorted_cars = functions.GetSortedCars("cc", descending=False)
-
-        elif selected_sort == "CC: High to Low":
-            sorted_cars = functions.GetSortedCars("cc", descending=True)
-
-        else:
-            return
-
-        if isinstance(sorted_cars, list):
-            self.update_grid(sorted_cars)
-            self.right_info_label.setText(f"Showing <b>{len(sorted_cars)}</b> vehicles")
-        else:
-            print(f"functions.py did not return a list: {sorted_cars}")
-            self.update_grid([])
-            self.right_info_label.setText("Showing <b>0</b> vehicles")    
-    
+            
+ 
     def open_filters(self):
         dialog = FilterDialog(self)
         if dialog.exec():
@@ -655,7 +625,7 @@ class MainDashboard(QMainWindow):
         
 
         self.old_password_input = QLineEdit()
-        self.old_password_input.setPlaceholderText("Old password")
+        self.old_password_input.setPlaceholderText("Current password")
         self.old_password_input.setEchoMode(QLineEdit.Password)
         self.old_password_input.setMinimumHeight(44)
 
