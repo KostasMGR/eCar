@@ -203,7 +203,7 @@ def RegisterUser(user: classes.User):
                           user.license_type))
         conn.commit()
         msg="Registered user with email: " + str(user.email)
-        WriteErrorLog("RegisterUser",msg)
+        WriteLog("RegisterUser",msg)
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
@@ -213,7 +213,7 @@ def RegisterUser(user: classes.User):
         db.close()
         conn.close()
 
-def GiveDealerAccess(email: str):
+def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and WriteLog
     try:
         conn, db = ConnectDB()
         
@@ -574,3 +574,22 @@ def GetReservationByCarID(car_id: int, user_email):
     finally:
         db.close()
         conn.close()
+
+def ShowReservations():
+    try:
+        conn,db = ConnectDB()
+
+        query = "select * from reservations"
+        db.execute(query)
+        reservations = db.fetchall()
+        return reservations
+
+    except Exception as e:
+        print(f"Error: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()

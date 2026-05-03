@@ -310,32 +310,68 @@ class DealerWindow(QMainWindow):
         self.res_layout = QVBoxLayout(page)
         return page
 
-    def show_reservations(self):
-        for i in reversed(range(self.res_layout.count())):
-            self.res_layout.itemAt(i).widget().setParent(None)
-
-        # Χρήση της GetUserReservations(email) από το functions.py
-        res_data = functions.GetUserReservations(self.session_email)
+    def show_dashboard(self):
+        # Καθαρισμός προηγούμενων widgets
+        for i in reversed(range(self.dash_layout.count())): 
+            widget = self.dash_layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
         
-        table = QTableWidget(len(res_data) if res_data else 0, 5)
-        table.setHorizontalHeaderLabels(["ID", "Car ID", "Start Date", "End Date", "Total Price"])
+        cars = functions.GetCars()
+        
+        # Αυξάνουμε τις στήλες σε 6 για να χωρέσει το κουμπί διαγραφής
+        table = QTableWidget(len(cars) if cars else 0, 6)
+        table.setHorizontalHeaderLabels(["Brand", "Model", "Plate", "Status", "Price/Day", "Actions"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
-
-        if res_data:
-            for row, res in enumerate(res_data):
-                table.setItem(row, 0, QTableWidgetItem(str(res['reservation_id'])))
-                table.setItem(row, 1, QTableWidgetItem(str(res['car_id'])))
-                table.setItem(row, 2, QTableWidgetItem(str(res['start_date'])))
-                table.setItem(row, 3, QTableWidgetItem(str(res['end_date'])))
-                table.setItem(row, 4, QTableWidgetItem(f"{res['total_price']} €"))
-
-        self.res_layout.addWidget(table)
-        self.pages.setCurrentIndex(2)
+        
+        if cars:
+            for row, car in enumerate(cars):
+                table.setItem(row, 0, QTableWidgetItem(car['brand']))
+                table.setItem(row, 1, QTableWidgetItem(car['model']))
+                table.setItem(row, 2, QTableWidgetItem(car['license_plate']))
+                table.setItem(row, 3, QTableWidgetItem(car['state']))
+                table.setItem(row, 4, QTableWidgetItem(str(car['price'])))
+                
+                # Δημιουργία κουμπιού διαγραφής
+                btn_delete = QPushButton("Delete")
+                btn_delete.setStyleSheet("""
+                    QPushButton { 
+                        background-color: #ef4444; color: white; border-radius: 4px; padding: 5px; 
+                    }
+                    QPushButton:hover { background-color: #dc2626; }
+                """)
+                # Χρήση license_plate ως μοναδικό αναγνωριστικό για τη διαγραφή
+                plate = car['license_plate']
+                btn_delete.clicked.connect(lambda checked, p=plate: self.delete_car_action(p))
+                
+                table.setCellWidget(row, 5, btn_delete)
+        
+        self.dash_layout.addWidget(table)
+        self.pages.setCurrentIndex(0)
+    def delete_car_action(self, plate):
+        # Παράθυρο επιβεβαίωσης
+        confirm = QMessageBox.question(
+            self, "Confirm Delete", 
+            f"Are you sure you want to delete vehicle with plate: {plate}?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+        
+        if confirm == QMessageBox.Yes:
+            # Υποθέτουμε ότι υπάρχει συνάρτηση DeleteCar(plate) στο back_end.functions
+            if hasattr(functions, 'DeleteCar'):
+                success = functions.DeleteCar(plate)
+                if success:
+                    QMessageBox.information(self, "Success", "Vehicle deleted successfully.")
+                    self.show_dashboard() # Refresh το table
+                else:
+                    QMessageBox.warning(self, "Error", "Could not delete vehicle. It might be linked to a reservation.")
+            else:
+                QMessageBox.critical(self, "System Error", "Function 'DeleteCar' not found in back_end.functions")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     # Χρησιμοποιήστε ένα test email για να εκτελεστεί το παράθυρο
-    window = DealerWindow("a@gmail.com") 
+    window = DealerWindow("test@gmail.com") 
     window.show()
     sys.exit(app.exec())
