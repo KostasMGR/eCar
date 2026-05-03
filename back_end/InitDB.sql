@@ -40,3 +40,16 @@ license_type varchar(3));
  reservation_status varchar(21) not null,
  FOREIGN KEY (Car_ID) REFERENCES cars(Car_ID) ON DELETE RESTRICT,
  FOREIGN KEY (User_ID) REFERENCES users(User_ID) ON DELETE CASCADE);
+
+INSERT INTO cars 
+(brand, model, production_year, license_plate, seats, doors, cc, state, car_description, fuel_type, transmission_type, horsepower, image_path, price, availability)
+VALUES
+('Toyota', 'Corolla', 2020, 'ABC1234', 5, 4, 1600, 'Available', 'Reliable compact sedan', 'Gas', 'Manual', 132, 'ABC1234', 45.0, TRUE),
+
+('Tesla', 'Model 3', 2022, 'TES5678', 5, 4, NULL, 'Available', 'Electric sedan with autopilot', 'Electric', 'Auto', 283, 'TES5678', 120.0, TRUE),
+
+('Volkswagen', 'Golf', 2019, 'GOL9012', 5, 4, 1400, 'In_Service', 'Popular hatchback', 'Gas', 'Manual', 125, 'GOL9012', 40.0, FALSE),
+
+('BMW', 'X5', 2021, 'BMW3456', 5, 5, 3000, 'Unavailable', 'Luxury SUV', 'Diesel', 'Auto', 265, 'BMW3456', 150.0, FALSE),
+
+('Hyundai', 'i20', 2018, 'HYU7890', 5, 4, 1200, 'Available', 'Economic city car', 'Gas', 'Manual', 84, 'HYU7890', 30.0, TRUE);
