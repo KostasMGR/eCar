@@ -9,7 +9,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="8716",
+            password="",
             database="eCar_db"
         )
         
@@ -419,28 +419,43 @@ def DeleteUserByEmail(email: str):
         db.close()
         conn.close()
 
-def ChangePassword(user: classes.User, new_password: str):
+def ChangePassword(email: str, old_password: str, new_password: str):
     try:
-        conn,db = ConnectDB()
+        if not email:
+            return False, "No user session found. Please log in again."
+        
+        email = email.strip()
+        old_password = old_password.strip()
+        new_password = new_password.strip()
+        
+        if not old_password or not new_password:
+            return False, "Please fill in all fields."
+
+        conn, db = ConnectDB()
 
         if conn is None or db is None:
-            print("Failed to connect with database.")
-            return
-        
-        if not CheckUserExists(user):
-            print("User doesn't exist")  
-            return False
-        
-        query="update users set user_password=%s where username=%s"
-        db.execute(query, (new_password,user.username))
+            return False, "Failed to connect with database."
+
+        query = "SELECT user_password FROM users WHERE email = %s"
+        db.execute(query, (email,))
+        user = db.fetchone()
+
+        if user is None:
+            return False, "User does not exist."
+
+        if user["user_password"] != old_password:
+            return False, "Old password is wrong."
+
+        update_query = "UPDATE users SET user_password = %s WHERE email = %s"
+        db.execute(update_query, (new_password, email))
         conn.commit()
-        print("Επιτυχία")
-        return True
-    
+
+        return True, "Password changed successfully."
+
     except Exception as e:
-        print(f"Error during update: {e}")   
-        return False
-    
+        print(f"Error during password update: {e}")
+        return False, "Error while changing password."
+
     finally:
         if 'db' in locals() and db is not None:
             db.close()

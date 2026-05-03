@@ -663,7 +663,6 @@ class MainDashboard(QMainWindow):
 
         return settings_page
 
-
     def change_password(self):
         old_password = self.old_password_input.text().strip()
         new_password = self.new_password_input.text().strip()
@@ -679,18 +678,23 @@ class MainDashboard(QMainWindow):
             self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
             return
 
-        success, message = functions.ChangePassword(self.session_email, old_password, new_password)
+        success, message = functions.ChangePassword(
+            self.session_email,
+            old_password,
+            new_password
+        )
 
         if success:
             self.old_password_input.clear()
             self.new_password_input.clear()
             self.confirm_password_input.clear()
+
             self.password_status_label.setText(message)
             self.password_status_label.setStyleSheet("color: #1f9d55; font-size: 13px; font-weight: 600; background: transparent; border: none;")
         else:
             self.password_status_label.setText(message)
-            self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;") 
-
+            self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+    
     def reservations(self):  
         
         self.stacked_widget.setCurrentIndex(1)
