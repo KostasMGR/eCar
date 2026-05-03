@@ -213,7 +213,7 @@ def RegisterUser(user: classes.User):
         db.close()
         conn.close()
 
-def GiveDealerAccess(email: str):
+def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and WriteLog
     try:
         conn, db = ConnectDB()
         
