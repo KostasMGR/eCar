@@ -1,23 +1,53 @@
 from datetime import datetime
 import mysql.connector
+import os
 #import classes
 from back_end import classes
 from back_end.session import session
+def WriteErrorLog(funcname: str, err: str):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(BASE_DIR, "..", "logs", "errlogs.txt")
+
+    print("Path from write error:", full_path)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+    with open(full_path, "a", encoding="utf-8") as f:
+        f.write(f"[{timestamp}] Σφάλμα σύνδεσης με τη βάση ({funcname}): {err}\n")
+
+def WriteLog(funcname: str, msg: str):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(BASE_DIR, "..", "logs", "logs.txt")
+
+    print("Path from write log:", full_path)
+
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)  # safety
+
+    with open(full_path, "a", encoding="utf-8") as f:
+        f.write(f"{timestamp} - {msg} ({funcname})\n")
+
 def ConnectDB():
     try:
         # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
+            password="8716",
             database="eCar_db"
         )
         
         cursor = conn.cursor(dictionary=True,buffered=True)
-        print("AFTER CURSOR\n")
+        timestamp = datetime.now
+        msg="Connected to db"
+        WriteLog("ConnectDB",msg)
         return conn,cursor
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")
+        WriteErrorLog("ConnectDB",err)
         return None
     
 def CheckCarExists(car: classes.Car):
@@ -32,6 +62,7 @@ def CheckCarExists(car: classes.Car):
             return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση (checkcarexists): {err}")
+        WriteErrorLog("CheckCarExists",err)
         return None
     finally:
         db.close()
@@ -47,6 +78,7 @@ def GetCars():
         return car
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση from getcars: {err}")
+        WriteErrorLog("GetCars",err)
         return None
     finally:
         db.close()
@@ -68,9 +100,12 @@ def CreateCar(car: classes.Car):
         db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
                           car.desc,car.fuel,car.trans,car.horsepower,car.plate,car.price,car.availability))
         conn.commit()
+        msg="Created Car with license plate: "+str(car.plate)
+        WriteLog("CreateCar",msg) 
         return True
     except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")  
+        WriteErrorLog("CreateCar",err) 
         return False
     finally:
         db.close()
@@ -85,6 +120,7 @@ def GetUsers():
         return users
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την ανάκτηση χρηστών (GetUsers): {err}")
+        WriteErrorLog("GetUsers",err) 
         return None
     finally:
         db.close()
@@ -122,6 +158,7 @@ def FilterCars(price: float, year: int, cc: int, horses: int):
 
     except mysql.connector.Error as err:
         print(f"FilterCars database error: {err}")
+        WriteErrorLog("FilterCars",err)
         return []
 
     finally:
@@ -145,6 +182,7 @@ def CheckUserExists(user: classes.User):
             return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
+        WriteErrorLog("CheckUserExists",err)
         return None
     finally:
         db.close()
@@ -164,9 +202,12 @@ def RegisterUser(user: classes.User):
         db.execute(query,(user.username,user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
                           user.license_type))
         conn.commit()
+        msg="Registered user with email: " + str(user.email)
+        WriteErrorLog("RegisterUser",msg)
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        WriteErrorLog("RegisterUser",err)
         return False
     finally:
         db.close()

@@ -292,7 +292,7 @@ class AdminWindow(QMainWindow):
         # --- Button actions ---
       
         logs_btn.clicked.connect(lambda: load_file("logs.txt"))
-        errors_btn.clicked.connect(lambda: load_file("errors.txt"))
+        errors_btn.clicked.connect(lambda: load_file("errlogs.txt"))
 
         # Load default
         #load_file("logs.txt")

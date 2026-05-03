@@ -1,0 +1,1 @@
+[2026-05-03 19:55:19] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
