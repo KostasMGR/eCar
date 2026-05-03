@@ -10,6 +10,7 @@ from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QIcon, QAction, QFontDatabase
 from back_end import authentication as auth
 from main_user import MainDashboard
+from dealer_page import DealerWindow
 from back_end.session import session
 #TODO: Custom font
 #QtGui.QFontDatabase.addApplicationFont('assets/fonts/Modern_Mono.otf')
@@ -241,8 +242,10 @@ class LoginWindow(QWidget):
                 self.user_window = AdminWindow(email)
                 self.user_window.show()
                 self.close()
-            #else if role == "Dealer" :
-             #   self.user_window = DealerWindow(email)
+            elif role == "Dealer":
+                self.user_window = DealerWindow(email)
+                self.user_window.show()
+                self.close()
             else:
                 self.user_window = MainDashboard(email)
                 self.user_window.show()
