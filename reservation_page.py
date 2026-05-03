@@ -52,7 +52,8 @@ class ReservationsWindow(QWidget):
         #db_cars = functions.GetUserReservations(session_email)
         print(session_email)
         db_cars = functions.GetReservedCarsByUser(session_email)
-       # reservation= functions.GetUserReservations(session_email)
+        #reservation= functions.GetUserReservations(session_email)
+        #print("Reservations: ",reservation)
         print(db_cars)
         if db_cars:
             self.cars = db_cars
@@ -466,8 +467,9 @@ class ReservationsWindow(QWidget):
                     background-color: #ff9999;
                 }
             """)
-
-        price_label = QLabel(f"€{car['price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ day</span>")
+        res = functions.GetReservationByCarID(car["car_id"],self.session_email)
+        print(res)
+        price_label = QLabel(f"€{res['total_price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ day</span>")
         price_label.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
