@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QFrame, QTableWidget, 
@@ -222,7 +223,7 @@ class AdminWindow(QMainWindow):
             print(f"Successfully updated {email} to {new_role}")
         else:
             print(f"Failed to update role for {email}")
-    def create_logs_page(self):
+    """     def create_logs_page(self):#TODO
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0,0,0,0)
@@ -230,16 +231,76 @@ class AdminWindow(QMainWindow):
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        log_text = QLabel(
-            " [INFO] 2024-05-20 10:22:01 - User admin logged in\n"
-            " [WARN] 2024-05-20 10:25:44 - Failed login attempt from 192.168.1.1\n"
-            " [INFO] 2024-05-20 10:30:12 - New car 'Tesla Model 3' added to database"
-        )
+        log_text = QLabel()
+        with open ("logs.txt","r",encoding="utf-8") as f:
+            content= f.read()
+        print(content)
+        log_text.setText(content)
         log_text.setStyleSheet("font-family: 'Courier New'; color: #10b981; background: #0f172a; padding: 20px;")
         log_text.setAlignment(Qt.AlignTop)
         
         scroll.setWidget(log_text)
         layout.addWidget(scroll)
+        return page
+        """
+
+    def create_logs_page(self):
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        layout.addWidget(self.create_banner("System Logs", "Real-time activity monitoring."))
+
+        # --- Buttons ---
+        button_layout = QHBoxLayout()
+
+        logs_btn = QPushButton("Logs")
+        errors_btn = QPushButton("Errors")
+
+        button_layout.addWidget(logs_btn)
+        button_layout.addWidget(errors_btn)
+
+        layout.addLayout(button_layout)
+
+        # --- Scroll area ---
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+
+        log_text = QLabel()
+        log_text.setAlignment(Qt.AlignTop)
+        log_text.setWordWrap(True)
+        log_text.setStyleSheet("""
+            font-family: 'Courier New';
+            color: #10b981;
+            background: #0f172a;
+            padding: 20px;
+        """)
+
+        scroll.setWidget(log_text)
+        layout.addWidget(scroll)
+
+        def load_file(filename):
+            try:
+                full_path = os.path.join(BASE_DIR, "logs",filename)
+                print("Opening the full_path:", full_path)  
+
+                with open(full_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    print("CONTENT LENGTH:", len(content))  
+
+                    log_text.setText(content if content else "File is empty.")
+                    log_text.adjustSize()
+            except FileNotFoundError:
+                log_text.setText(f"{filename} not found.")
+
+        # --- Button actions ---
+      
+        logs_btn.clicked.connect(lambda: load_file("logs.txt"))
+        errors_btn.clicked.connect(lambda: load_file("errors.txt"))
+
+        # Load default
+        #load_file("logs.txt")
         return page
 
     def delete_user(self, row):
