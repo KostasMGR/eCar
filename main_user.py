@@ -581,7 +581,7 @@ class MainDashboard(QMainWindow):
         
 
         self.old_password_input = QLineEdit()
-        self.old_password_input.setPlaceholderText("Old password")
+        self.old_password_input.setPlaceholderText("Current password")
         self.old_password_input.setEchoMode(QLineEdit.Password)
         self.old_password_input.setMinimumHeight(44)
 
