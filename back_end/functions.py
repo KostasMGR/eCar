@@ -579,7 +579,7 @@ def ShowReservations():
     try:
         conn,db = ConnectDB()
 
-        query = "select * from reservations"
+        query = "SELECT r.*, u.username FROM reservations r JOIN users u ON r.user_id = u.user_id"
         db.execute(query)
         reservations = db.fetchall()
         return reservations

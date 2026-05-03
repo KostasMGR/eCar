@@ -119,7 +119,40 @@ class DealerWindow(QMainWindow):
         
         self.dash_layout.addWidget(table)
         self.pages.setCurrentIndex(0)
+    def show_reservations(self):
+        # Καθαρισμός layout
+        for i in reversed(range(self.res_layout.count())):
+            widget = self.res_layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
 
+        # Ανάκτηση δεδομένων (πλέον περιέχουν και το πεδίο 'username')
+        res_data = functions.ShowReservations() 
+        
+        # Ορίζουμε 6 στήλες και αλλάζουμε το User ID σε Customer
+        table = QTableWidget(len(res_data) if res_data else 0, 6)
+        table.setHorizontalHeaderLabels(["Res ID", "Car ID", "Customer", "Start Date", "End Date", "Total Price"])
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        table.setStyleSheet("color: black; background: white;")
+
+        if res_data:
+            for row, res in enumerate(res_data):
+                table.setItem(row, 0, QTableWidgetItem(str(res['reservation_id'])))
+                table.setItem(row, 1, QTableWidgetItem(str(res['car_id'])))
+                
+                # Εμφάνιση του Username αντί για το ID
+                table.setItem(row, 2, QTableWidgetItem(str(res['username'])))
+                
+                # Format ημερομηνιών
+                start_dt = res['start_date'].strftime("%Y-%m-%d %H:%M") if hasattr(res['start_date'], 'strftime') else str(res['start_date'])
+                end_dt = res['end_date'].strftime("%Y-%m-%d %H:%M") if hasattr(res['end_date'], 'strftime') else str(res['end_date'])
+                
+                table.setItem(row, 3, QTableWidgetItem(start_dt))
+                table.setItem(row, 4, QTableWidgetItem(end_dt))
+                table.setItem(row, 5, QTableWidgetItem(f"{res['total_price']} €"))
+
+        self.res_layout.addWidget(table)
+        self.pages.setCurrentIndex(2)
     # --- 2. CREATE CAR (Χρήση classes.Car & CreateCar) ---[cite: 1, 4]
     def create_car_page(self):
         page = QScrollArea()
