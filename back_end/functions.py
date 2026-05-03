@@ -66,7 +66,7 @@ def CreateCar(car: classes.Car):
         "image_path, price, availability) VALUES (" \
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
         db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
-                          car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+                          car.desc,car.fuel,car.trans,car.horsepower,car.plate,car.price,car.availability))
         conn.commit()
         return True
     except mysql.connector.Error as err:
