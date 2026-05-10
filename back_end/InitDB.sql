@@ -53,3 +53,52 @@ VALUES
 ('BMW', 'X5', 2021, 'BMW3456', 5, 5, 3000, 'Unavailable', 'Luxury SUV', 'Diesel', 'Auto', 265, 'BMW3456', 150.0, FALSE),
 
 ('Hyundai', 'i20', 2018, 'HYU7890', 5, 4, 1200, 'Available', 'Economic city car', 'Gas', 'Manual', 84, 'HYU7890', 30.0, TRUE);
+
+
+INSERT INTO users
+(username, user_password, user_role, first_name, surname, email, phone_number, license_number, license_type)
+VALUES
+('john_doe', 'pass123', 'Customer', 'John', 'Doe', 'john@email.com', '6900000001', 'LIC12345', 'B'),
+
+('alice_smith', 'pass123', 'Customer', 'Alice', 'Smith', 'alice@email.com', '6900000002', 'LIC67890', 'B'),
+
+('mike_brown', 'pass123', 'Customer', 'Mike', 'Brown', 'mike@email.com', '6900000003', 'LIC54321', 'B');
+
+INSERT INTO reservations
+(car_id, user_id, start_date, end_date, total_price, reservation_status)
+VALUES
+
+-- Toyota Corolla (car_id = 1)
+(1, 1,
+'2026-05-15 10:00:00',
+'2026-05-18 10:00:00',
+135.0,
+'Confirmed'),
+
+-- Tesla Model 3 (car_id = 2)
+(2, 2,
+'2026-05-20 09:00:00',
+'2026-05-25 09:00:00',
+600.0,
+'Confirmed'),
+
+-- Hyundai i20 (car_id = 5)
+(5, 3,
+'2026-05-12 14:00:00',
+'2026-05-14 14:00:00',
+60.0,
+'Pending'),
+
+-- Another reservation for Corolla
+(1, 2,
+'2026-05-22 08:00:00',
+'2026-05-24 08:00:00',
+90.0,
+'Confirmed'),
+
+-- Cancelled reservation (should NOT block availability)
+(2, 1,
+'2026-05-28 10:00:00',
+'2026-05-30 10:00:00',
+240.0,
+'Cancelled');

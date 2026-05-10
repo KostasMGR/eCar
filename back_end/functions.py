@@ -36,7 +36,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
+            password="8716",
             database="eCar_db"
         )
         
@@ -593,3 +593,33 @@ def ShowReservations():
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
+
+def GetAvailableCars(start, end ):
+
+    try:
+        conn,db = ConnectDB()
+        st = datetime.strptime(start, "%Y-%m-%d %H:%M")
+        et = datetime.strptime(end, "%Y-%m-%d %H:%M")
+        query = """
+        SELECT *
+        FROM cars c
+        WHERE c.availability = TRUE
+        AND c.state = 'Available'
+        AND c.car_id NOT IN (
+            SELECT r.car_id
+            FROM reservations r
+            WHERE r.reservation_status != 'Cancelled'
+                AND r.start_date < %s
+                AND r.end_date > %s
+        );
+        """
+        db.execute(query, (et,st))
+        cars = db.fetchall()
+        return cars
+    except mysql.connector.Error as err:
+        print(f"Error getting user's reserved cars: {err}")
+        return None
+
+    finally:
+        db.close()
+        conn.close()
