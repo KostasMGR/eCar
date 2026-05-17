@@ -52,12 +52,12 @@ def ConnectDB():
         WriteErrorLog("ConnectDB",str(err))
         return None
     
-def CheckCarExists(plate):
+def CheckCarExists(car: classes.Car):
     try:
 
         conn,db = ConnectDB()
         query = "select * from cars where license_plate=%s"
-        db.execute(query,(plate,))
+        db.execute(query,(car.plate,))
         res = db.fetchone()
         if res is None:
             return False
@@ -300,17 +300,31 @@ def GiveAdminAccess(email: str):
             conn.close()
 
 def DeleteCar(plate):
+    print("From delete car",plate)
     try:
         conn,db = ConnectDB() 
-        if CheckCarExists(plate):
+        car = GetCarByLicense(plate)
+
+        if car is None:
             print("Car doesn't exists")  
             return False
+        print("License plate after get car by plate",car['license_plate']," and car id ",car['car_id'] )
            
-        query = "delete from cars where car_id=%s"
-        car = GetCarByLicense(plate)
-        db.execute(query,(car.car_id))
+        reservation_query = """
+        DELETE FROM reservations
+        WHERE car_id=%s
+        """
+
+        db.execute(reservation_query, (car['car_id'],))
+
+        car_query = """
+        DELETE FROM cars
+        WHERE car_id=%s
+        """
+
+        db.execute(car_query, (car['car_id'],))
         conn.commit()
-        msg = f"Deleted car with id: {car.car_id}"
+        msg = f"Deleted car with id: {car['car_id']}"
         WriteLog("DeleteCar", msg)
         return True
     except Exception as err:
@@ -374,6 +388,8 @@ def GetCarByLicense(license:str):
         db.execute(query,(license, ))
         print("after db execute\n")
         car = db.fetchone()
+        if car is None : 
+            return None
         return car
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
