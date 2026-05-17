@@ -114,18 +114,7 @@ class CarDetailsDialog(QDialog):
         # Μικρό κενό
         layout.addSpacing(8)
 
-        # 3. Description
-        desc = QLabel(car['car_description'])
-        desc.setWordWrap(True)
-        desc.setStyleSheet("""
-            color: #d4d4d4;
-            font-size: 14px;
-            line-height: 1.4;
-        """)
-
-        layout.addWidget(desc)
-
-        layout.addSpacing(10)
+        
 
         # 2. Εικόνα Αυτοκινήτου
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -147,6 +136,19 @@ class CarDetailsDialog(QDialog):
             car_image.setStyleSheet("font-size: 34px; color: #5c6b7c; background: transparent;")
             
         layout.addWidget(car_image)
+        layout.addSpacing(10)
+
+        # 3. Description
+        desc = QLabel(car['car_description'])
+        desc.setWordWrap(True)
+        desc.setStyleSheet("""
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.4;
+        """)
+
+        layout.addWidget(desc)
+
         layout.addSpacing(10)
 
         # 3. Μπάρα Χαρακτηριστικών
