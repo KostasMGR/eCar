@@ -111,6 +111,20 @@ class CarDetailsDialog(QDialog):
         subtitle.setStyleSheet("color: #a3a3a3; font-size: 13px;")
         layout.addWidget(subtitle)
 
+        # Μικρό κενό
+        layout.addSpacing(8)
+
+        # 3. Description
+        desc = QLabel(car['car_description'])
+        desc.setWordWrap(True)
+        desc.setStyleSheet("""
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.4;
+        """)
+
+        layout.addWidget(desc)
+
         layout.addSpacing(10)
 
         # 2. Εικόνα Αυτοκινήτου
