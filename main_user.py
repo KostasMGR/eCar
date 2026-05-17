@@ -121,12 +121,16 @@ class CarDetailsDialog(QDialog):
         car_image = QLabel()
         pixmap = QPixmap(full_path)
         if not pixmap.isNull():
-            scaled_pixmap = pixmap.scaled(400, 150, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+            scaled_pixmap = pixmap.scaled(
+                280, 200, 
+                Qt.KeepAspectRatio,  # ΑΛΛΑΓΗ ΕΔΩ
+                Qt.SmoothTransformation
+            )
             car_image.setPixmap(scaled_pixmap)
+            
         else:
-            car_image.setText("[εικόνα]")
-            car_image.setAlignment(Qt.AlignCenter)
-            car_image.setStyleSheet("color: #a3a3a3; border: 1px dashed #444; padding: 40px;")
+            car_image.setText("🚗")
+            car_image.setStyleSheet("font-size: 34px; color: #5c6b7c; background: transparent;")
             
         layout.addWidget(car_image)
         layout.addSpacing(10)
