@@ -52,12 +52,12 @@ def ConnectDB():
         WriteErrorLog("ConnectDB",str(err))
         return None
     
-def CheckCarExists(car: classes.Car):
+def CheckCarExists(plate):
     try:
 
         conn,db = ConnectDB()
         query = "select * from cars where license_plate=%s"
-        db.execute(query,(car.plate,))
+        db.execute(query,(plate,))
         res = db.fetchone()
         if res is None:
             return False
@@ -70,6 +70,36 @@ def CheckCarExists(car: classes.Car):
     finally:
         db.close()
         conn.close()
+
+def GetAvailableCarsByDates(start_date: str, end_date: str):
+    """
+    Returns cars that are in 'Available' state AND have no overlapping
+    confirmed/pending reservations in the given date range.
+    """
+    try:
+        conn, db = ConnectDB()
+        query = """
+            SELECT * FROM cars
+            WHERE state = 'Available'
+            AND car_id NOT IN (
+                SELECT car_id FROM reservations
+                WHERE reservation_status NOT IN ('Cancelled')
+                AND start_date < %s
+                AND end_date > %s
+            )
+        """
+        db.execute(query, (end_date, start_date))
+        cars = db.fetchall()
+        return cars
+    except mysql.connector.Error as err:
+        print(f"Error in GetAvailableCarsByDates: {err}")
+        WriteErrorLog("GetAvailableCarsByDates", str(err))
+        return []
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GetCars():
     try:
@@ -129,7 +159,7 @@ def GetUsers():
         db.close()
         conn.close()
 
-def FilterCars(price: float, year: int, cc: int, horses: int):
+def FilterCars(price: float, year: int, cc: int, horses: int, start_date: str = None, end_date: str = None):
     try:
         conn, db = ConnectDB()
 
@@ -152,6 +182,20 @@ def FilterCars(price: float, year: int, cc: int, horses: int):
             query += " AND horsepower >= %s"
             params.append(horses)
 
+        # Filter by date availability if dates are provided
+        if start_date and end_date:
+            query += " AND state = 'Available'"
+            query += """
+                AND car_id NOT IN (
+                    SELECT car_id FROM reservations
+                    WHERE reservation_status NOT IN ('Cancelled')
+                    AND start_date < %s
+                    AND end_date > %s
+                )
+            """
+            params.append(end_date)
+            params.append(start_date)
+
         query += ";"
 
         db.execute(query, tuple(params))
@@ -161,7 +205,7 @@ def FilterCars(price: float, year: int, cc: int, horses: int):
 
     except mysql.connector.Error as err:
         print(f"FilterCars database error: {err}")
-        WriteErrorLog("FilterCars",str(err))
+        WriteErrorLog("FilterCars", str(err))
         return []
 
     finally:
@@ -335,7 +379,7 @@ def DeleteCar(plate):
         db.close()
         conn.close()
 
-def GetSortedCars(sort_by: str, descending: bool = False):
+def GetSortedCars(sort_by: str, descending: bool = False, start_date: str = None, end_date: str = None):
     try:
         conn, db = ConnectDB()
 
@@ -345,20 +389,34 @@ def GetSortedCars(sort_by: str, descending: bool = False):
             "cc": "cc"
         }
         if sort_by not in valid_columns:
-            print(f"Προσοχή: Μη έγκυρο κριτήριο ταξινόμησης '{sort_by}'.")
+            print(f"Invalid sort criterion: '{sort_by}'.")
             return None
         
         db_column = valid_columns[sort_by]
         order = "DESC" if descending else "ASC"
 
-        query = f"SELECT * FROM cars ORDER BY {db_column} {order};"
-        db.execute(query)
+        if start_date and end_date:
+            query = f"""
+                SELECT * FROM cars
+                WHERE state = 'Available'
+                AND car_id NOT IN (
+                    SELECT car_id FROM reservations
+                    WHERE reservation_status NOT IN ('Cancelled')
+                    AND start_date < %s
+                    AND end_date > %s
+                )
+                ORDER BY {db_column} {order};
+            """
+            db.execute(query, (end_date, start_date))
+        else:
+            query = f"SELECT * FROM cars ORDER BY {db_column} {order};"
+            db.execute(query)
 
         cars = db.fetchall()
         return cars
     
     except mysql.connector.Error as err:
-        print(f"Σφάλμα κατά την ταξινόμηση (GetSortedCars): {err}")
+        print(f"GetSortedCars error: {err}")
         WriteErrorLog("GetSortedCars", str(err))
         return None
     finally:
@@ -388,8 +446,6 @@ def GetCarByLicense(license:str):
         db.execute(query,(license, ))
         print("after db execute\n")
         car = db.fetchone()
-        if car is None : 
-            return None
         return car
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
@@ -439,9 +495,7 @@ def CreateReservation(email:str,start_date, end_date,car_id):
         query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
         conn.commit()
-        query = "UPDATE cars SET availability=0 , state='Unavailable' WHERE car_id=%s"
-        db.execute(query,(car_id,))
-        conn.commit()
+        # Do NOT change car state — availability is determined dynamically via date overlap
         msg = f"Created reservation for user {email}, car_id {car_id}, from {start_date} to {end_date}"
         WriteLog("CreateReservation", msg)
         return True
@@ -571,11 +625,7 @@ def DeleteReservation(reservation_id: int):
         delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
         db.execute(delete_query, (reservation_id,))
         conn.commit()
-        print("Reservation car id: ", res['car_id'])
-        query = "UPDATE cars SET availability=1 , state='Available' WHERE car_id=%s"
-        db.execute(query,(res['car_id'],))
-        conn.commit()
-        msg = f"Deleted reservation {reservation_id} and made car {res['car_id']} available again"
+        msg = f"Deleted reservation {reservation_id} for car {res['car_id']}"
         WriteLog("DeleteReservation", msg)
 
         print(f"The reservation with ID {reservation_id} deleted.")

@@ -124,16 +124,12 @@ class CarDetailsDialog(QDialog):
         car_image = QLabel()
         pixmap = QPixmap(full_path)
         if not pixmap.isNull():
-            scaled_pixmap = pixmap.scaled(
-                280, 200, 
-                Qt.KeepAspectRatio,  # ΑΛΛΑΓΗ ΕΔΩ
-                Qt.SmoothTransformation
-            )
+            scaled_pixmap = pixmap.scaled(400, 150, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
             car_image.setPixmap(scaled_pixmap)
-            
         else:
-            car_image.setText("🚗")
-            car_image.setStyleSheet("font-size: 34px; color: #5c6b7c; background: transparent;")
+            car_image.setText("[εικόνα]")
+            car_image.setAlignment(Qt.AlignCenter)
+            car_image.setStyleSheet("color: #a3a3a3; border: 1px dashed #444; padding: 40px;")
             
         layout.addWidget(car_image)
         layout.addSpacing(10)
@@ -206,13 +202,10 @@ class MainDashboard(QMainWindow):
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
         self.session_email=session_email
-        # Τραβάμε τα αυτοκίνητα
-        db_cars = functions.GetCars()
-
-        if db_cars:
-            self.cars = db_cars
-        else:
-            self.cars = []
+        # Dates selected by user — empty until search is performed
+        self.selected_start_date = None
+        self.selected_end_date = None
+        self.cars = []
 
         outer = QWidget()
         self.setCentralWidget(outer)
@@ -423,27 +416,169 @@ class MainDashboard(QMainWindow):
             background: transparent;
         """)
 
-        stats_row = QHBoxLayout()
-        stats_row.setSpacing(12)
-        stats_row.addWidget(self.make_stat_chip(f"{len(self.cars)} Cars"))
-        stats_row.addWidget(self.make_stat_chip("Available"))
-        stats_row.addStretch()
+        self.stats_row = QHBoxLayout()
+        self.stats_row.setSpacing(12)
+        self.stat_chip_cars = self.make_stat_chip("0 Cars")
+        self.stat_chip_available = self.make_stat_chip("Available")
+        self.stats_row.addWidget(self.stat_chip_cars)
+        self.stats_row.addWidget(self.stat_chip_available)
+        self.stats_row.addStretch()
 
         banner_layout.addLayout(banner_top)
         banner_layout.addStretch()
         banner_layout.addWidget(title)
         banner_layout.addWidget(subtitle)
         banner_layout.addSpacing(8)
-        banner_layout.addLayout(stats_row)
+        banner_layout.addLayout(self.stats_row)
 
         content_layout.addWidget(banner)
-        
+
         #Logout Button
         btn_logout = QPushButton(" Logout")
         btn_logout.setCursor(Qt.PointingHandCursor)
         btn_logout.setMinimumHeight(46)
         btn_logout.clicked.connect(self.logout)
 
+        # =========================
+        # Date Picker Panel (shown before car grid)
+        # =========================
+        self.date_picker_panel = QFrame()
+        self.date_picker_panel.setStyleSheet("""
+            QFrame {
+                background-color: #f5f7fb;
+            }
+        """)
+        date_picker_outer = QVBoxLayout(self.date_picker_panel)
+        date_picker_outer.setContentsMargins(0, 0, 0, 0)
+        date_picker_outer.setAlignment(Qt.AlignCenter)
+
+        # Dark card in the center (matching screenshot)
+        date_card = QFrame()
+        date_card.setFixedWidth(460)
+        date_card.setStyleSheet("""
+            QFrame {
+                background-color: #1a2b27;
+                border-radius: 16px;
+            }
+            QLabel {
+                color: white;
+                background: transparent;
+            }
+        """)
+        date_card_layout = QVBoxLayout(date_card)
+        date_card_layout.setContentsMargins(32, 28, 32, 28)
+        date_card_layout.setSpacing(16)
+
+        date_card_title = QLabel("Select Dates")
+        date_card_title.setStyleSheet("font-size: 20px; font-weight: 800; color: white; background: transparent;")
+        date_card_title.setAlignment(Qt.AlignCenter)
+
+        date_card_subtitle = QLabel("to check for available cars")
+        date_card_subtitle.setStyleSheet("font-size: 13px; color: rgba(255,255,255,0.7); background: transparent;")
+        date_card_subtitle.setAlignment(Qt.AlignCenter)
+
+        # Pickup / Drop-off row
+        dates_row = QHBoxLayout()
+        dates_row.setSpacing(18)
+
+        pickup_wrap = QVBoxLayout()
+        pickup_label = QLabel("Pickup:")
+        pickup_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
+        self.pickup_input = QLineEdit()
+        self.pickup_input.setPlaceholderText("YYYY-MM-DD")
+        self.pickup_input.setMinimumHeight(44)
+        self.pickup_input.setStyleSheet("""
+            QLineEdit {
+                background-color: white;
+                color: #1a2b27;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 14px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            QLineEdit:focus {
+                border: 2px solid #6a9a83;
+            }
+        """)
+        pickup_wrap.addWidget(pickup_label)
+        pickup_wrap.addWidget(self.pickup_input)
+
+        dropoff_wrap = QVBoxLayout()
+        dropoff_label = QLabel("Drop-off:")
+        dropoff_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
+        self.dropoff_input = QLineEdit()
+        self.dropoff_input.setPlaceholderText("YYYY-MM-DD")
+        self.dropoff_input.setMinimumHeight(44)
+        self.dropoff_input.setStyleSheet("""
+            QLineEdit {
+                background-color: white;
+                color: #1a2b27;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 14px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            QLineEdit:focus {
+                border: 2px solid #6a9a83;
+            }
+        """)
+        dropoff_wrap.addWidget(dropoff_label)
+        dropoff_wrap.addWidget(self.dropoff_input)
+
+        dates_row.addLayout(pickup_wrap)
+        dates_row.addLayout(dropoff_wrap)
+
+        self.date_error_label = QLabel("")
+        self.date_error_label.setStyleSheet("color: #ff7777; font-size: 12px; background: transparent;")
+        self.date_error_label.setAlignment(Qt.AlignCenter)
+
+        btn_search_dates = QPushButton("Search Available Cars")
+        btn_search_dates.setCursor(Qt.PointingHandCursor)
+        btn_search_dates.setMinimumHeight(46)
+        btn_search_dates.clicked.connect(self.on_search_dates)
+        btn_search_dates.setStyleSheet("""
+            QPushButton {
+                background-color: #6a9a83;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 14px;
+                font-weight: 800;
+            }
+            QPushButton:hover {
+                background-color: #5a8571;
+            }
+            QPushButton:pressed {
+                background-color: #4e7462;
+            }
+        """)
+
+        date_card_layout.addWidget(date_card_title)
+        date_card_layout.addWidget(date_card_subtitle)
+        date_card_layout.addSpacing(8)
+        date_card_layout.addLayout(dates_row)
+        date_card_layout.addWidget(self.date_error_label)
+        date_card_layout.addWidget(btn_search_dates)
+
+        date_picker_outer.addStretch()
+        date_picker_outer.addWidget(date_card, alignment=Qt.AlignCenter)
+        date_picker_outer.addStretch()
+
+        content_layout.addWidget(self.date_picker_panel)
+
+
+        # =========================
+        # Cars panel (toolbar + grid) — hidden until dates are chosen
+        # =========================
+        self.cars_panel = QWidget()
+        self.cars_panel.setStyleSheet("background-color: transparent;")
+        cars_panel_layout = QVBoxLayout(self.cars_panel)
+        cars_panel_layout.setContentsMargins(0, 0, 0, 0)
+        cars_panel_layout.setSpacing(0)
+        self.cars_panel.hide()
 
         # Toolbar
         toolbar = QWidget()
@@ -548,7 +683,28 @@ class MainDashboard(QMainWindow):
         toolbar_layout.addWidget(self.right_info_label)
         toolbar_layout.addWidget(btn_filter)
 
-        content_layout.addWidget(toolbar)
+        # "Change Dates" button at the right of toolbar
+        btn_change_dates = QPushButton("✏ Change Dates")
+        btn_change_dates.setCursor(Qt.PointingHandCursor)
+        btn_change_dates.setMinimumHeight(38)
+        btn_change_dates.clicked.connect(self.go_back_to_date_picker)
+        btn_change_dates.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                color: #334155;
+                border: 1px solid #d5deeb;
+                border-radius: 10px;
+                padding: 8px 14px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+            QPushButton:hover {
+                background-color: #f0f4f3;
+            }
+        """)
+        toolbar_layout.addWidget(btn_change_dates)
+
+        cars_panel_layout.addWidget(toolbar)
 
         # Scroll area
         scroll = QScrollArea()
@@ -577,15 +733,15 @@ class MainDashboard(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
-
         self.grid = QGridLayout(scroll_content)
         self.grid.setContentsMargins(28, 24, 28, 28)
         self.grid.setHorizontalSpacing(22)
         self.grid.setVerticalSpacing(22)
-        self.update_grid(self.cars)
 
         scroll.setWidget(scroll_content)
-        content_layout.addWidget(scroll)
+        cars_panel_layout.addWidget(scroll)
+
+        content_layout.addWidget(self.cars_panel)
         # Φέρνουμε τη σελίδα των Reservations από το άλλο αρχείο
         self.res_page = ReservationsWindow(self.session_email)
         self.settings_page = self.create_settings_page()
@@ -640,52 +796,60 @@ class MainDashboard(QMainWindow):
         if not selected_sort:
             return
 
+        start = self.selected_start_date
+        end = self.selected_end_date
+
         if selected_sort == "Price: Low to High":
-            sorted_cars = functions.GetSortedCars("price", descending=False)
+            sorted_cars = functions.GetSortedCars("price", descending=False, start_date=start, end_date=end)
 
         elif selected_sort == "Price: High to Low":
-            sorted_cars = functions.GetSortedCars("price", descending=True)
+            sorted_cars = functions.GetSortedCars("price", descending=True, start_date=start, end_date=end)
 
         elif selected_sort == "Year: Newest First":
-            sorted_cars = functions.GetSortedCars("year", descending=True)
+            sorted_cars = functions.GetSortedCars("year", descending=True, start_date=start, end_date=end)
 
         elif selected_sort == "Year: Oldest First":
-            sorted_cars = functions.GetSortedCars("year", descending=False)
+            sorted_cars = functions.GetSortedCars("year", descending=False, start_date=start, end_date=end)
 
         elif selected_sort == "CC: Low to High":
-            sorted_cars = functions.GetSortedCars("cc", descending=False)
+            sorted_cars = functions.GetSortedCars("cc", descending=False, start_date=start, end_date=end)
 
         elif selected_sort == "CC: High to Low":
-            sorted_cars = functions.GetSortedCars("cc", descending=True)
+            sorted_cars = functions.GetSortedCars("cc", descending=True, start_date=start, end_date=end)
 
         else:
             return
 
         if isinstance(sorted_cars, list):
             self.update_grid(sorted_cars)
-            self.right_info_label.setText(f"Showing <b>{len(sorted_cars)}</b> vehicles")
+            available_count = sum(1 for car in sorted_cars if car["state"] == "Available")
+            self.right_info_label.setText(f"Showing <b>{available_count}</b> available vehicles")
         else:
             print(f"functions.py did not return a list: {sorted_cars}")
             self.update_grid([])
             self.right_info_label.setText("Showing <b>0</b> vehicles")    
             
- 
     def open_filters(self):
         dialog = FilterDialog(self)
         if dialog.exec():
             try:
                 price, year, cc, hp = dialog.get_values()
-                
+                start = self.selected_start_date
+                end = self.selected_end_date
+
                 if all(v is None for v in [price, year, cc, hp]):
-                    filtered = functions.GetCars()
+                    # No filter values — just re-fetch available cars for the selected dates
+                    filtered = functions.GetAvailableCarsByDates(start, end) if start and end else functions.GetCars()
                 else:
-                    filtered = functions.FilterCars(price, year, cc, hp)
+                    filtered = functions.FilterCars(price, year, cc, hp, start_date=start, end_date=end)
                 
-                if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
+                if isinstance(filtered, list):
                     self.update_grid(filtered)
+                    available_count = sum(1 for car in filtered if car["state"] == "Available")
+                    self.right_info_label.setText(f"Showing <b>{available_count}</b> available vehicles")
                 else:
-                    print(f"functions.py den esteile thn lista {filtered}")
-                    self.update_grid([]) # an den esteile lista, emfanise keno
+                    print(f"functions.py did not return a list: {filtered}")
+                    self.update_grid([])
             except ValueError:
                 print("Error please enter only numbers!")
     def logout(self):
@@ -904,11 +1068,66 @@ class MainDashboard(QMainWindow):
 
 
 
-    def refresh_dashboard(self):
-        self.cars = functions.GetCars() or []
+    def on_search_dates(self):
+        """Validate dates, fetch available cars, show the grid."""
+        start_str = self.pickup_input.text().strip()
+        end_str = self.dropoff_input.text().strip()
+
+        # Validate format
+        try:
+            start_dt = datetime.strptime(start_str, "%Y-%m-%d")
+            end_dt = datetime.strptime(end_str, "%Y-%m-%d")
+        except ValueError:
+            self.date_error_label.setText("Please enter dates in YYYY-MM-DD format.")
+            return
+
+        if end_dt <= start_dt:
+            self.date_error_label.setText("Drop-off date must be after pickup date.")
+            return
+
+        if start_dt < datetime.now().replace(hour=0, minute=0, second=0, microsecond=0):
+            self.date_error_label.setText("Pickup date cannot be in the past.")
+            return
+
+        self.date_error_label.setText("")
+
+        # Store as full datetime strings (midnight)
+        self.selected_start_date = start_str + " 00:00"
+        self.selected_end_date = end_str + " 00:00"
+
+        # Fetch cars available for these dates
+        available_cars = functions.GetAvailableCarsByDates(start_str, end_str)
+        if available_cars is None:
+            available_cars = []
+        self.cars = available_cars
+
+        # Update banner stats
+        self.stat_chip_cars.setText(f"{len(self.cars)} Cars")
+
+        # Show the cars panel, hide the date picker
+        self.date_picker_panel.hide()
+        self.cars_panel.show()
+
+        # Update the grid and the info label
         self.update_grid(self.cars)
         available_count = sum(1 for car in self.cars if car["state"] == "Available")
         self.right_info_label.setText(f"Showing <b>{available_count}</b> vehicles")
+
+    def go_back_to_date_picker(self):
+        """Go back to the date picker panel."""
+        self.cars_panel.hide()
+        self.date_picker_panel.show()
+        self.selected_start_date = None
+        self.selected_end_date = None
+
+    def refresh_dashboard(self):
+        # When navigating back to Dashboard tab, show date picker again
+        self.cars_panel.hide()
+        self.date_picker_panel.show()
+        self.selected_start_date = None
+        self.selected_end_date = None
+        self.cars = []
+        self.stat_chip_cars.setText("0 Cars")
     
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
@@ -944,22 +1163,29 @@ class MainDashboard(QMainWindow):
         return chip
     def handle_rent(self, car): #NEW FUNC 
         from reservation_page import DatePickerDialog 
-        #def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
-        date_dialog = DatePickerDialog(self)
-        if date_dialog.exec() == QDialog.Accepted:
-            start_str, end_str = date_dialog.get_dates()
-            st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
-            et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
-            days = (et - st).days
-            if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
-            
-            total_price = days * car['price']
-            # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
-            from pay import PaymentWindow
-            print("Car plate from main: ", car['license_plate'])
-            self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
-            self.payment_screen.show()
-            self.close() # Κλείνουμε το dashboard όσο πληρώνει
+        # If dates are already selected from the dashboard search, skip the date picker
+        if self.selected_start_date and self.selected_end_date:
+            start_str = self.selected_start_date
+            end_str = self.selected_end_date
+        else:
+            date_dialog = DatePickerDialog(self)
+            if date_dialog.exec() == QDialog.Accepted:
+                start_str, end_str = date_dialog.get_dates()
+            else:
+                return
+
+        st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
+        et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
+        days = (et - st).days
+        if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
+        
+        total_price = days * car['price']
+        # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
+        from pay import PaymentWindow
+        print("Car plate from main: ", car['license_plate'])
+        self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
+        self.payment_screen.show()
+        self.close() # Κλείνουμε το dashboard όσο πληρώνει
 
     def show_car_details(self, car):
         # Ανοίγει το custom popup που φτιάξαμε
