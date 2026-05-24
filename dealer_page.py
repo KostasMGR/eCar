@@ -65,13 +65,14 @@ class DealerWindow(QMainWindow):
         self.btn_create = self.make_nav_btn("Create Car")
         self.btn_res = self.make_nav_btn("View Reservations")
         
+        
         for btn in [self.btn_dash, self.btn_create, self.btn_res]:
             sidebar_layout.addWidget(btn)
         
         sidebar_layout.addStretch()
         shell_layout.addWidget(sidebar)
 
-        btn_view = QPushButton("View Listing As User")
+        btn_view = QPushButton("View Listings As User")
         btn_view.setCursor(Qt.PointingHandCursor)
         btn_view.setMinimumHeight(46)
         btn_view.setStyleSheet("""
@@ -81,13 +82,13 @@ class DealerWindow(QMainWindow):
                 border: none;
                 font-size: 14px;
                 font-weight: 700;
-                color: #f87171;
+                color: #94A3B8;
                 background: transparent;
                 border-left: 4px solid transparent;
             }
             QPushButton:hover {
-                background-color: #3d2424;
-                color: #ff4444;
+                background-color: #1E293B;
+                color: #ffffff;
             }
         """)
         btn_view.clicked.connect(self.view)
@@ -465,7 +466,7 @@ class DealerWindow(QMainWindow):
     
     def edit_car_action(self, plate, current_price, current_state):
         dialog = QDialog(self)
-        dialog.setWindowTitle(f"Επεξεργασία: {plate}")
+        dialog.setWindowTitle(f"Edit: {plate}")
         dialog.setFixedWidth(360)
         dialog.setStyleSheet("""
             QDialog { background-color: #f8fafc; border-radius: 12px; }
@@ -476,7 +477,7 @@ class DealerWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(25, 25, 25, 25)
         
-        title = QLabel(f"Ρυθμίσεις Οχήματος\n{plate}")
+        title = QLabel(f"Vehicle Settings\n{plate}")
         title.setStyleSheet("font-size: 18px; color: #1e293b; margin-bottom: 10px;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
@@ -524,12 +525,12 @@ class DealerWindow(QMainWindow):
             }
         """)
         
-        form.addRow("Τιμή / Ημέρα:", price_input)
-        form.addRow("Κατάσταση:", state_input)
+        form.addRow("Price / Day:", price_input)
+        form.addRow("State:", state_input)
         layout.addLayout(form)
         
         btn_layout = QHBoxLayout()
-        btn_cancel = QPushButton("Ακύρωση")
+        btn_cancel = QPushButton("Cancel")
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
             QPushButton { background-color: #e2e8f0; color: #475569; padding: 10px; border-radius: 6px; font-weight: bold; }
@@ -537,7 +538,7 @@ class DealerWindow(QMainWindow):
         """)
         btn_cancel.clicked.connect(dialog.reject)
         
-        btn_save = QPushButton("Αποθήκευση")
+        btn_save = QPushButton("Save")
         btn_save.setCursor(Qt.PointingHandCursor)
         btn_save.setStyleSheet("""
             QPushButton { background-color: #3b82f6; color: white; padding: 10px; border-radius: 6px; font-weight: bold; }
@@ -562,11 +563,11 @@ class DealerWindow(QMainWindow):
                 db.execute(query, (new_price, new_state, availability, plate))
                 conn.commit()
                 
-                QMessageBox.information(self, "Επιτυχία", f"Τα στοιχεία του οχήματος ενημερώθηκαν!")
+                QMessageBox.information(self, "Success", f"Car Information Updated!")
                 self.show_dashboard()
                 
             except Exception as e:
-                QMessageBox.warning(self, "Σφάλμα", f"Αποτυχία ενημέρωσης: {e}")
+                QMessageBox.warning(self, "Error", f"Info Update Failed!: {e}")
             finally:
                 if 'db' in locals() and db is not None: db.close()
                 if 'conn' in locals() and conn is not None: conn.close()
