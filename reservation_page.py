@@ -227,10 +227,14 @@ class ReservationsWindow(QWidget):
         self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> reservations")
 
         row = 0
+        col = 0
         for car in cars_list:
             card = self.create_car_card(car)
-            self.grid.addWidget(card, row, 0, alignment=Qt.AlignTop | Qt.AlignHCenter)
-            row += 1
+            self.grid.addWidget(card, row, col, alignment=Qt.AlignTop | Qt.AlignLeft) 
+            col += 1
+            if col > 1: 
+                col = 0
+                row += 1
         
           
     def logout(self):
