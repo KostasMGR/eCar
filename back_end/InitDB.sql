@@ -44,25 +44,27 @@ license_type varchar(3));
 INSERT INTO cars 
 (brand, model, production_year, license_plate, seats, doors, cc, state, car_description, fuel_type, transmission_type, horsepower, image_path, price, availability)
 VALUES
-('Toyota', 'Corolla', 2020, 'ABC1234', 5, 4, 1600, 'Available', 'Reliable compact sedan', 'Gas', 'Manual', 132, 'ABC1234', 45.0, TRUE),
+('Toyota', 'Aygo', 2011, 'XEO9053', 5, 4, 1000, 'Available', 'TOTOYA EGG', 'Gas', 'Manual', 70, 'XEO9053', 45.0, TRUE),
 
-('Tesla', 'Model 3', 2022, 'TES5678', 5, 4, NULL, 'Available', 'Electric sedan with autopilot', 'Electric', 'Auto', 283, 'TES5678', 120.0, TRUE),
+('Mercedes', 'e200', 2001, 'ITT4171', 5, 4, 2000, 'Available', 'ALBANIAN MAFIA MERCEDES', 'Gas', 'Manual', 200, 'ITT4171', 250.0, TRUE),
 
-('Volkswagen', 'Golf', 2019, 'GOL9012', 5, 4, 1400, 'In_Service', 'Popular hatchback', 'Gas', 'Manual', 125, 'GOL9012', 40.0, FALSE),
+('BMW', 'e39', 2000, 'APE9350', 5, 4, 2979, 'Available', 'Beba', 'Gas', 'Manual', 125, 'APE9350', 120.0, TRUE),
 
-('BMW', 'X5', 2021, 'BMW3456', 5, 5, 3000, 'Unavailable', 'Luxury SUV', 'Diesel', 'Auto', 265, 'BMW3456', 150.0, FALSE),
+('OPEL', 'CORSA', 2003, 'ZMO9981', 2, 5, 1389, 'Available', '200 euro car', 'Gas', 'Manual', 70, 'ZMO9981', 50.0, TRUE),
 
-('Hyundai', 'i20', 2018, 'HYU7890', 5, 4, 1200, 'Available', 'Economic city car', 'Gas', 'Manual', 84, 'HYU7890', 30.0, TRUE);
+('PEUGEOT', '206', 2001, 'ZZM5364', 5, 5, 1300, 'Available', 'OG peugeot', 'Gas', 'Manual', 86, 'ZZM5364', 150.0, TRUE),
+
+('CITROEN', 'SAXO', 1998, 'AΡΕ2763', 5, 4, 1200, 'In_Service', 'Exploded', 'Gas', 'Manual', 75, 'AΡΕ2763', 30.0, TRUE);
 
 
 INSERT INTO users
 (username, user_password, user_role, first_name, surname, email, phone_number, license_number, license_type)
 VALUES
-('john_doe', 'pass123', 'Customer', 'John', 'Doe', 'john@email.com', '6900000001', 'LIC12345', 'B'),
+('admin', 'a', 'Admin', 'Admin', 'Admin', 'admin@gmail.com', '6900000001', '', ''),
 
-('alice_smith', 'pass123', 'Customer', 'Alice', 'Smith', 'alice@email.com', '6900000002', 'LIC67890', 'B'),
+('user1', 'u1', 'Customer', 'Alice', 'Smith', 'user1@gmail.com', '6900000002', 'LIC67890', 'B'),
 
-('mike_brown', 'pass123', 'Customer', 'Mike', 'Brown', 'mike@email.com', '6900000003', 'LIC54321', 'B');
+('dealer', 'd1', 'Dealer', 'Mike', 'Brown', 'dealer@gmail.com', '6900000003', 'LIC54321', 'B');
 
 INSERT INTO reservations
 (car_id, user_id, start_date, end_date, total_price, reservation_status)
