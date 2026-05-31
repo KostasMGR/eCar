@@ -53,7 +53,6 @@ class RentDetails(QDialog):
         
         layout = QVBoxLayout(self)
         
-        # Εμφάνιση Τιμής
         message = QLabel(f"Η συνολική τιμή είναι: <b>€{total_price}</b>")
         message.setAlignment(Qt.AlignCenter)
         message.setStyleSheet("font-size: 16px; margin: 20px;")
@@ -112,7 +111,6 @@ class CarDetailsDialog(QDialog):
         subtitle.setStyleSheet("color: #a3a3a3; font-size: 13px;")
         layout.addWidget(subtitle)
 
-        # Μικρό κενό
         layout.addSpacing(8)
 
         
@@ -176,7 +174,6 @@ class CarDetailsDialog(QDialog):
             "Same to same fuel policy"
         ]
 
-        # Τα πορτοκαλί/κίτρινα Checkmarks (Όπως στο mockup)
         for b in benefits:
             b_lbl = QLabel(f"✓ {b}")
             b_lbl.setStyleSheet("color: #ffb84d; font-size: 13px; font-weight: bold;") 
@@ -185,7 +182,7 @@ class CarDetailsDialog(QDialog):
         layout.addLayout(benefits_layout)
         layout.addSpacing(20)
 
-        # 6. Τιμή & Rent Button (Κάτω σειρά)
+        # 6. Τιμή & Rent Button
         bottom_row = QHBoxLayout()
         
         price_lbl = QLabel(f"€{car['price']} <span style='font-size: 12px; font-weight: normal;'>/ day</span>")
@@ -203,7 +200,7 @@ class MainDashboard(QMainWindow):
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
         self.session_email=session_email
-        # Dates selected by user — empty until search is performed
+
         self.selected_start_date = None
         self.selected_end_date = None
         self.cars = []
@@ -240,9 +237,9 @@ class MainDashboard(QMainWindow):
 
         outer_layout.addWidget(app_shell)
 
-        # =========================
+
         # Sidebar
-        # =========================
+
         sidebar = QFrame()
         sidebar.setFixedWidth(220)
         sidebar.setStyleSheet("""
@@ -346,19 +343,14 @@ class MainDashboard(QMainWindow):
 
         shell_layout.addWidget(sidebar)
 
-        # =========================
         # Main content
-        # =========================
-        # =========================
-        # Main content (Η Στοίβα με τις σελίδες)
-        # =========================
+
         self.stacked_widget = QStackedWidget()
         shell_layout.addWidget(self.stacked_widget)
 
-        # Κουτί για το Dashboard
         self.dashboard_container = QWidget()
         self.dashboard_container.setStyleSheet("background-color: transparent;")
-        content_layout = QVBoxLayout(self.dashboard_container) # Προσοχή, τώρα μπαίνει στο dashboard_container
+        content_layout = QVBoxLayout(self.dashboard_container)
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(0)
 
@@ -440,9 +432,9 @@ class MainDashboard(QMainWindow):
         btn_logout.setMinimumHeight(46)
         btn_logout.clicked.connect(self.logout)
 
-        # =========================
+
         # Date Picker Panel (shown before car grid)
-        # =========================
+
         self.date_picker_panel = QFrame()
         self.date_picker_panel.setStyleSheet("""
             QFrame {
@@ -453,7 +445,7 @@ class MainDashboard(QMainWindow):
         date_picker_outer.setContentsMargins(0, 0, 0, 0)
         date_picker_outer.setAlignment(Qt.AlignCenter)
 
-        # Dark card in the center (matching screenshot)
+        # Dark card in the center
         date_card = QFrame()
         date_card.setFixedWidth(460)
         date_card.setStyleSheet("""
@@ -485,16 +477,16 @@ class MainDashboard(QMainWindow):
         pickup_wrap = QVBoxLayout()
         pickup_label = QLabel("Pickup:")
         pickup_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
-        # =========================
+
         # Pickup Wrap
-        # =========================
+
         pickup_wrap = QVBoxLayout()
         pickup_label = QLabel("Pickup:")
         pickup_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
         
         self.pickup_input = QDateEdit()
-        self.pickup_input.setCalendarPopup(True) # Ενεργοποιεί το ημερολόγιο
-        self.pickup_input.setDate(QDate.currentDate()) # Default: Σημερινή ημερομηνία
+        self.pickup_input.setCalendarPopup(True)
+        self.pickup_input.setDate(QDate.currentDate()) 
         self.pickup_input.setDisplayFormat("yyyy-MM-dd")
         self.pickup_input.setMinimumHeight(44)
         self.pickup_input.setStyleSheet("""
@@ -525,16 +517,16 @@ class MainDashboard(QMainWindow):
         pickup_wrap.addWidget(pickup_label)
         pickup_wrap.addWidget(self.pickup_input)
 
-        # =========================
+
         # Drop-off Wrap
-        # =========================
+
         dropoff_wrap = QVBoxLayout()
         dropoff_label = QLabel("Drop-off:")
         dropoff_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
         
         self.dropoff_input = QDateEdit()
-        self.dropoff_input.setCalendarPopup(True) # Ενεργοποιεί το ημερολόγιο
-        self.dropoff_input.setDate(QDate.currentDate().addDays(1)) # Default: Αυριανή ημερομηνία
+        self.dropoff_input.setCalendarPopup(True) 
+        self.dropoff_input.setDate(QDate.currentDate().addDays(1)) 
         self.dropoff_input.setDisplayFormat("yyyy-MM-dd")
         self.dropoff_input.setMinimumHeight(44)
         self.dropoff_input.setStyleSheet("""
@@ -608,9 +600,9 @@ class MainDashboard(QMainWindow):
         content_layout.addWidget(self.date_picker_panel)
 
 
-        # =========================
-        # Cars panel (toolbar + grid) — hidden until dates are chosen
-        # =========================
+
+        # Cars panel (toolbar + grid) 
+
         self.cars_panel = QWidget()
         self.cars_panel.setStyleSheet("background-color: transparent;")
         cars_panel_layout = QVBoxLayout(self.cars_panel)
@@ -690,7 +682,7 @@ class MainDashboard(QMainWindow):
         """)
 
         btn_filter = QPushButton("Filter")
-        btn_filter.setEnabled(True)  # frontend only
+        btn_filter.setEnabled(True) 
         btn_filter.clicked.connect(self.open_filters)
         btn_filter.setStyleSheet("""
         QPushButton {
@@ -721,7 +713,6 @@ class MainDashboard(QMainWindow):
         toolbar_layout.addWidget(self.right_info_label)
         toolbar_layout.addWidget(btn_filter)
 
-        # "Change Dates" button at the right of toolbar
         btn_change_dates = QPushButton("✏ Change Dates")
         btn_change_dates.setCursor(Qt.PointingHandCursor)
         btn_change_dates.setMinimumHeight(38)
@@ -780,14 +771,12 @@ class MainDashboard(QMainWindow):
         cars_panel_layout.addWidget(scroll)
 
         content_layout.addWidget(self.cars_panel)
-        # Φέρνουμε τη σελίδα των Reservations από το άλλο αρχείο
         self.res_page = ReservationsWindow(self.session_email)
         self.settings_page = self.create_settings_page()
 
-        # Βάζουμε τις 3 σελίδες στο QStackedWidget
         self.stacked_widget.addWidget(self.dashboard_container) # Index 0
         self.stacked_widget.addWidget(self.res_page)            # Index 1
-        self.stacked_widget.addWidget(self.settings_page)       # Index 2         # Index 1
+        self.stacked_widget.addWidget(self.settings_page)       # Index 2      
 
 
     
@@ -798,7 +787,7 @@ class MainDashboard(QMainWindow):
             if widget:
                 widget.deleteLater()
                 
-        if not cars_list:   # Filtered list is empty (no cars match the criteria           
+        if not cars_list:            
                 no_cars_label = QLabel("No cars matched these criteria.")
                 no_cars_label.setAlignment(Qt.AlignCenter)
                 no_cars_label.setStyleSheet("""
@@ -816,7 +805,7 @@ class MainDashboard(QMainWindow):
                 
                 self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
-# ALAGH AVAILABILITY
+        # AVAILABILITY
         row = 0
         col = 0
         for car in cars_list:
@@ -1129,7 +1118,6 @@ class MainDashboard(QMainWindow):
 
         self.date_error_label.setText("")
 
-        # Store as full datetime strings (midnight)
         self.selected_start_date = start_str + " 00:00"
         self.selected_end_date = end_str + " 00:00"
 
@@ -1215,18 +1203,16 @@ class MainDashboard(QMainWindow):
         st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
         days = (et - st).days
-        if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
+        if days <= 0: days = 1 
         
         total_price = days * car['price']
-        # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
         from pay import PaymentWindow
         print("Car plate from main: ", car['license_plate'])
         self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
         self.payment_screen.show()
-        self.close() # Κλείνουμε το dashboard όσο πληρώνει
+        self.close()
 
     def show_car_details(self, car):
-        # Ανοίγει το custom popup που φτιάξαμε
         dialog = CarDetailsDialog(car, self)
         dialog.exec()
 
@@ -1330,10 +1316,8 @@ class MainDashboard(QMainWindow):
 
         print("BASE_DIR IS ", BASE_DIR)
         
-        # 1. Add the .png extension to the car's image name
         filename = f"{car['image_path']}.png"
 
-        # 2. Join BASE_DIR, the "imgs" folder, and the filename all together
         full_path = os.path.join(BASE_DIR, "imgs", filename)
 
         print(full_path)

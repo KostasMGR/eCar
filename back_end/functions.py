@@ -34,7 +34,6 @@ def WriteLog(funcname: str, msg: str):
 
 def ConnectDB():
     try:
-        # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -215,8 +214,6 @@ def FilterCars(price: float, year: int, cc: int, horses: int, start_date: str = 
             conn.close()
     
 
-#TODO update/cars
-
 def CheckUserExists(user: classes.User):
     try:
         conn,db = ConnectDB()
@@ -267,11 +264,10 @@ def RegisterUser(user: classes.User):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
-def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and WriteLog
+def GiveDealerAccess(email: str):
     try:
         conn, db = ConnectDB()
-        
-        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
+
         check_query = "SELECT user_role FROM users WHERE email = %s"
         db.execute(check_query, (email,))
         user = db.fetchone()
@@ -284,7 +280,6 @@ def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and Wr
             print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Dealer! Δεν χρειάζεται αλλαγή.")
             return True
         
-        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Dealer, του αλλάζουμε ρόλο!
         update_query = "UPDATE users SET user_role = 'Dealer' WHERE email = %s"
         db.execute(update_query, (email,))
         conn.commit()
@@ -308,22 +303,18 @@ def GiveAdminAccess(email: str):
     try:
         conn, db = ConnectDB()
         
-        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
         check_query = "SELECT user_role FROM users WHERE email = %s"
         db.execute(check_query, (email,))
         user = db.fetchone()
-        
-        # Αν η βάση επιστρέψει None, ο χρήστης δεν υπάρχει!
+
         if user is None:
             print(f"Προσοχή: Δεν βρέθηκε χρήστης με το email {email}.")
             return False
-            
-        # Αν υπάρχει, ελέγχουμε τον τωρινό του ρόλο
+
         if user['user_role'] == 'Admin':
             print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Admin! Δεν χρειάζεται αλλαγή.")
             return True
-        
-        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Admin, τον αναβαθμίζουμε!
+
         update_query = "UPDATE users SET user_role = 'Admin' WHERE email = %s"
         db.execute(update_query, (email,))
         conn.commit()
@@ -542,12 +533,10 @@ def UpdateUserRole(email: str, new_role: str):
 def DeleteUserByEmail(email: str):
     try:
         conn, db = ConnectDB()
-        # Διαγραφή του χρήστη βάσει email
         query = "DELETE FROM users WHERE email = %s"
         db.execute(query, (email,))
         conn.commit()
-        
-        # Ελέγχουμε αν όντως διαγράφηκε κάποια γραμμή
+
         if db.rowcount > 0:
             msg = f"Deleted user with email: {email}"
             WriteLog("DeleteUserByEmail", msg)
@@ -612,7 +601,6 @@ def DeleteReservation(reservation_id: int):
     try:
         conn, db = ConnectDB() 
 
-        # 1. Ελέγχουμε αν υπάρχει η κράτηση
         check_query = "SELECT * FROM reservations WHERE reservation_id = %s"
         db.execute(check_query, (reservation_id,))
         res = db.fetchone()
@@ -620,8 +608,7 @@ def DeleteReservation(reservation_id: int):
         if res is None:
             print(f"Error: The reservation with ID {reservation_id} not found.")  
             return False
-            
-        # 2. Προχωράμε στη διαγραφή
+
         delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
         db.execute(delete_query, (reservation_id,))
         conn.commit()
@@ -771,7 +758,6 @@ def ChangeCarState(car : classes.Car):
             print("Car doesn't exist")  
             return False
         
-        # Ο dealer μόνο σε unavailable θα μπορεί να αλλάξει το state
         query="update cars set state='Unavailable' where license_plate=%s"
         db.execute(query, [car.plate])
         conn.commit()

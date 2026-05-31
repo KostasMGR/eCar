@@ -9,8 +9,6 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-
-# Εισαγωγή από τα αρχεία που αναφέρθηκαν
 from back_end import functions, classes
 
 class DealerWindow(QMainWindow):
@@ -65,11 +63,34 @@ class DealerWindow(QMainWindow):
         self.btn_create = self.make_nav_btn("Create Car")
         self.btn_res = self.make_nav_btn("View Reservations")
         
+        
         for btn in [self.btn_dash, self.btn_create, self.btn_res]:
             sidebar_layout.addWidget(btn)
         
         sidebar_layout.addStretch()
         shell_layout.addWidget(sidebar)
+
+        btn_view = QPushButton("View Listings As User")
+        btn_view.setCursor(Qt.PointingHandCursor)
+        btn_view.setMinimumHeight(46)
+        btn_view.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 700;
+                color: #94A3B8;
+                background: transparent;
+                border-left: 4px solid transparent;
+            }
+            QPushButton:hover {
+                background-color: #1E293B;
+                color: #ffffff;
+            }
+        """)
+        btn_view.clicked.connect(self.view)
+        sidebar_layout.addWidget(btn_view)
 
         btn_logout = QPushButton("Logout")
         btn_logout.setCursor(Qt.PointingHandCursor)
@@ -115,7 +136,7 @@ class DealerWindow(QMainWindow):
         self.nav_group.addButton(btn)
         return btn
 
-    # --- 1. VIEW DASHBOARD ---
+    # --- 1. VIEW DASHBOARD -
     def create_dashboard_page(self):
         page = QWidget()
         self.dash_layout = QVBoxLayout(page)
@@ -182,7 +203,7 @@ class DealerWindow(QMainWindow):
 
         self.res_layout.addWidget(table)
         self.pages.setCurrentIndex(2)
-    # --- 2. CREATE CAR (Χρήση classes.Car & CreateCar) ---[cite: 1, 4]
+    # 2. CREATE CAR (Χρήση classes.Car & CreateCar)
     def create_car_page(self):
         page = QScrollArea()
         container = QWidget()
@@ -199,9 +220,7 @@ class DealerWindow(QMainWindow):
         grid.setColumnStretch(1, 1) # Δίνει χώρο στα input fields
         grid.setColumnStretch(3, 1)
 
-        # Στυλ για τα Inputs
-        # Καθαρό στυλ χωρίς gradients για τα inputs
-        # Καθαρό στυλ χωρίς gradients για τα inputs και τις λίστες
+        # Στυλ για τα Input
         input_style = """
             QWidget#CarContainer {
                 background-color: #f1f5f9; /* Ελαφρύ γκρι φόντο για όλη τη σελίδα */
@@ -251,34 +270,28 @@ class DealerWindow(QMainWindow):
         self.f_price = QDoubleSpinBox(); self.f_price.setRange(0, 5000); self.f_price.setSuffix(" €")
         self.f_desc = QLineEdit(); self.f_desc.setPlaceholderText("Short vehicle description...")
 
-        # Τοποθέτηση στο Grid (Row, Col)
-        # Γραμμή 0
+        # Τοποθέτηση στο Grid
         grid.addWidget(QLabel("Brand:"), 0, 0); grid.addWidget(self.f_brand, 0, 1)
         grid.addWidget(QLabel("Model:"), 0, 2); grid.addWidget(self.f_model, 0, 3)
         
-        # Γραμμή 1
         grid.addWidget(QLabel("Year:"), 1, 0); grid.addWidget(self.f_year, 1, 1)
         grid.addWidget(QLabel("License Plate:"), 1, 2); grid.addWidget(self.f_plate, 1, 3)
 
-        # Γραμμή 2
         grid.addWidget(QLabel("Seats:"), 2, 0); grid.addWidget(self.f_seats, 2, 1)
         grid.addWidget(QLabel("Doors:"), 2, 2); grid.addWidget(self.f_doors, 2, 3)
 
-        # Γραμμή 3
         grid.addWidget(QLabel("Engine CC:"), 3, 0); grid.addWidget(self.f_cc, 3, 1)
         grid.addWidget(QLabel("Horsepower:"), 3, 2); grid.addWidget(self.f_hp, 3, 3)
 
-        # Γραμμή 4
         grid.addWidget(QLabel("Fuel Type:"), 4, 0); grid.addWidget(self.f_fuel, 4, 1)
         grid.addWidget(QLabel("Transmission:"), 4, 2); grid.addWidget(self.f_trans, 4, 3)
 
-        # Γραμμή 5
         grid.addWidget(QLabel("Status:"), 5, 0); grid.addWidget(self.f_state, 5, 1)
         grid.addWidget(QLabel("Price / Day:"), 5, 2); grid.addWidget(self.f_price, 5, 3)
 
         main_layout.addLayout(grid)
 
-        # Description (Full Width)
+        # Description
         main_layout.addWidget(QLabel("Description:"))
         main_layout.addWidget(self.f_desc)
 
@@ -306,7 +319,7 @@ class DealerWindow(QMainWindow):
         btn_submit.clicked.connect(self.submit_car)
         main_layout.addWidget(btn_submit)
         
-        main_layout.addStretch() # Σπρώχνει τα πάντα προς τα πάνω για να μην "αιωρούνται"
+        main_layout.addStretch()
 
         page.setWidget(container)
         page.setWidgetResizable(True)
@@ -325,7 +338,7 @@ class DealerWindow(QMainWindow):
         selected_img_path = self.image_path_display.text()
         plate_text = self.f_plate.text().strip()
 
-        # Έλεγχος αν έχει συμπληρωθεί η πινακίδα (απαραίτητο για το όνομα της εικόνας)
+        # Έλεγχος αν έχει συμπληρωθεί η πινακίδα
         if not plate_text:
             QMessageBox.warning(self, "Input Error", "Please enter a License Plate first.")
             return
@@ -335,26 +348,20 @@ class DealerWindow(QMainWindow):
         # Διαχείριση Φακέλου και Αντιγραφή Εικόνας
         if selected_img_path and os.path.exists(selected_img_path):
             try:
-                # Δημιουργία φακέλου imgs αν δεν υπάρχει
                 dest_folder = "imgs"
                 if not os.path.exists(dest_folder):
                     os.makedirs(dest_folder)
                 
-                # Ορισμός τελικής διαδρομής: imgs/ΠΙΝΑΚΙΔΑ.png
                 dest_path = os.path.join(dest_folder, final_img_name)
                 
-                # Αντιγραφή του αρχείου στον φάκελο imgs
                 shutil.copy2(selected_img_path, dest_path)
             except Exception as e:
                 QMessageBox.critical(self, "File Error", f"Could not save image: {str(e)}")
                 return
         else:
-            # Αν δεν επιλέχθηκε εικόνα, ορίζουμε μια default τιμή ή αφήνουμε κενό
             final_img_name = "default.png"
 
-        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
-        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
-        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
+        # Δημιουργία instance Car
         new_car = classes.Car(
             brand=self.f_brand.text(),
             model=self.f_model.text(),
@@ -379,14 +386,13 @@ class DealerWindow(QMainWindow):
             self.show_dashboard()
         else:
             QMessageBox.warning(self, "Database Error", "Could not create car. Plate might exist.")
-    # --- 3. VIEW RESERVATIONS ---
+    # 3. VIEW RESERVATIONS 
     def create_res_page(self):
         page = QWidget()
         self.res_layout = QVBoxLayout(page)
         return page
 
     def show_dashboard(self):
-        # Καθαρισμός προηγούμενων widgets
         for i in reversed(range(self.dash_layout.count())): 
             widget = self.dash_layout.itemAt(i).widget()
             if widget:
@@ -443,7 +449,7 @@ class DealerWindow(QMainWindow):
     
     def edit_car_action(self, plate, current_price, current_state):
         dialog = QDialog(self)
-        dialog.setWindowTitle(f"Επεξεργασία: {plate}")
+        dialog.setWindowTitle(f"Edit: {plate}")
         dialog.setFixedWidth(360)
         dialog.setStyleSheet("""
             QDialog { background-color: #f8fafc; border-radius: 12px; }
@@ -454,7 +460,7 @@ class DealerWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(25, 25, 25, 25)
         
-        title = QLabel(f"Ρυθμίσεις Οχήματος\n{plate}")
+        title = QLabel(f"Vehicle Settings\n{plate}")
         title.setStyleSheet("font-size: 18px; color: #1e293b; margin-bottom: 10px;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
@@ -468,7 +474,6 @@ class DealerWindow(QMainWindow):
         price_input.setSingleStep(50.0) 
         
         try:
-            # Καθαρίζουμε την τιμή από σύμβολα πριν τη μετατρέψουμε σε δεκαδικό αριθμό (float)
             clean_price = float(str(current_price).replace('€', '').replace(',', '.').strip())
         except ValueError:
             clean_price = 0.0
@@ -483,7 +488,6 @@ class DealerWindow(QMainWindow):
             }
         """)
         
-        # Πεδίο Κατάστασης με σωστά χρώματα
         state_input = QComboBox()
         state_input.addItems(['Available', 'In Service', 'Unavailable'])
         
@@ -502,12 +506,12 @@ class DealerWindow(QMainWindow):
             }
         """)
         
-        form.addRow("Τιμή / Ημέρα:", price_input)
-        form.addRow("Κατάσταση:", state_input)
+        form.addRow("Price / Day:", price_input)
+        form.addRow("State:", state_input)
         layout.addLayout(form)
         
         btn_layout = QHBoxLayout()
-        btn_cancel = QPushButton("Ακύρωση")
+        btn_cancel = QPushButton("Cancel")
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
             QPushButton { background-color: #e2e8f0; color: #475569; padding: 10px; border-radius: 6px; font-weight: bold; }
@@ -515,7 +519,7 @@ class DealerWindow(QMainWindow):
         """)
         btn_cancel.clicked.connect(dialog.reject)
         
-        btn_save = QPushButton("Αποθήκευση")
+        btn_save = QPushButton("Save")
         btn_save.setCursor(Qt.PointingHandCursor)
         btn_save.setStyleSheet("""
             QPushButton { background-color: #3b82f6; color: white; padding: 10px; border-radius: 6px; font-weight: bold; }
@@ -531,7 +535,6 @@ class DealerWindow(QMainWindow):
             new_price = price_input.value()
             new_state = state_input.currentText().replace(' ', '_')
             
-            # Απευθείας εγγραφή (bypass) στη βάση δεδομένων
             try:
                 conn, db = functions.ConnectDB()
                 availability = 1 if new_state == "Available" else 0 
@@ -540,11 +543,11 @@ class DealerWindow(QMainWindow):
                 db.execute(query, (new_price, new_state, availability, plate))
                 conn.commit()
                 
-                QMessageBox.information(self, "Επιτυχία", f"Τα στοιχεία του οχήματος ενημερώθηκαν!")
+                QMessageBox.information(self, "Success", f"Car Information Updated!")
                 self.show_dashboard()
                 
             except Exception as e:
-                QMessageBox.warning(self, "Σφάλμα", f"Αποτυχία ενημέρωσης: {e}")
+                QMessageBox.warning(self, "Error", f"Info Update Failed!: {e}")
             finally:
                 if 'db' in locals() and db is not None: db.close()
                 if 'conn' in locals() and conn is not None: conn.close()
@@ -558,7 +561,6 @@ class DealerWindow(QMainWindow):
         )
         
         if confirm == QMessageBox.Yes:
-            # Υποθέτουμε ότι υπάρχει συνάρτηση DeleteCar(plate) στο back_end.functions
             if hasattr(functions, 'DeleteCar'):
                 success = functions.DeleteCar(plate)
                 if success:
@@ -574,10 +576,14 @@ class DealerWindow(QMainWindow):
         self.login_win = LoginWindow()
         self.login_win.show()
         self.close()
+    def view(self):
+        from main_dealer import MainDealerWindow
+        self.dealer_win = MainDealerWindow(self.session_email)
+        self.dealer_win.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # Χρησιμοποιήστε ένα test email για να εκτελεστεί το παράθυρο
-    window = DealerWindow("test@gmail.com") 
+    window = DealerWindow(None) 
     window.show()
     sys.exit(app.exec())

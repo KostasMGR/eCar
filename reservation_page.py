@@ -40,7 +40,6 @@ class DatePickerDialog(QDialog):
         layout.addWidget(buttons)
 
     def get_dates(self):
-        # Επιστρέφει τις ημερομηνίες στο string format που ζήτησες
         start_str = self.start_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
         end_str = self.end_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
         return start_str, end_str
@@ -53,8 +52,6 @@ class ReservationsWindow(QWidget):
         #db_cars = functions.GetUserReservations(session_email)
         print(session_email)
         db_cars = functions.GetReservedCarsByUser(session_email)
-        #reservation= functions.GetUserReservations(session_email)
-        #print("Reservations: ",reservation)
         print(db_cars)
         if db_cars:
             self.cars = db_cars
@@ -63,9 +60,7 @@ class ReservationsWindow(QWidget):
 
         
 
-        # =========================
         # Main content
-        # =========================
         
         content_layout = QVBoxLayout(self)
         content_layout.setContentsMargins(0, 0, 0, 0)
@@ -179,12 +174,10 @@ class ReservationsWindow(QWidget):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
-        # ... (υπάρχων κώδικας toolbar) ...
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
         toolbar_layout.setSpacing(12)
 
         toolbar_layout.addStretch()
-        # ...
 
         self.grid = QGridLayout(scroll_content)
         self.grid.setContentsMargins(28, 24, 28, 28)
@@ -202,7 +195,6 @@ class ReservationsWindow(QWidget):
         dialog = DatePickerDialog(self)
         if dialog.exec() == QDialog.Accepted:
             start_date, end_date = dialog.get_dates()
-            # Εδώ οι ημερομηνίες είναι ακριβώς στο format που θες
             print(f"Start: {start_date}, End: {end_date}")
     def update_grid(self, cars_list):
         for i in reversed(range(self.grid.count())):
@@ -303,9 +295,7 @@ class ReservationsWindow(QWidget):
         layout.setContentsMargins(18, 18, 18, 18)
         layout.setSpacing(10)
 
-        # =========================
         # TOP (Brand, Model & Dates)
-        # =========================
         top_row = QHBoxLayout()
 
         name_wrap = QVBoxLayout()
@@ -330,11 +320,9 @@ class ReservationsWindow(QWidget):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        # Μορφοποίηση ημερομηνιών ΜΟΝΟ με έτος-μήνα-μέρα (χωρίς την ώρα)
         pickup_dt = car['start_date'].strftime("%Y-%m-%d") if hasattr(car['start_date'], 'strftime') else str(car['start_date']).split()[0]
         drop_dt = car['end_date'].strftime("%Y-%m-%d") if hasattr(car['end_date'], 'strftime') else str(car['end_date']).split()[0]
 
-        # Section για τις Ημερομηνίες Κράτησης
         dates_wrap = QVBoxLayout()
         dates_wrap.setSpacing(1)
         dates_wrap.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -360,9 +348,9 @@ class ReservationsWindow(QWidget):
         top_row.addStretch()
         top_row.addLayout(dates_wrap)
 
-        # =========================
+
         # IMAGE
-        # =========================
+
         image_box = QFrame()
         image_box.setFixedHeight(185)
         image_box.setStyleSheet("""
@@ -425,9 +413,9 @@ class ReservationsWindow(QWidget):
 
         image_layout.addWidget(car_image, alignment=Qt.AlignCenter)
 
-        # =========================
+    
         # CHIPS
-        # =========================
+    
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
 
@@ -437,9 +425,9 @@ class ReservationsWindow(QWidget):
         chips_row.addWidget(self.make_small_chip(car["fuel_type"]))
         chips_row.addStretch()
 
-        # =========================
+
         # INFO (Branch & Description)
-        # =========================
+
         info_wrap = QVBoxLayout()
         info_wrap.setSpacing(3)
 
@@ -451,10 +439,10 @@ class ReservationsWindow(QWidget):
             border: none;
         """)
 
-        # Εμφάνιση της πραγματικής περιγραφής (car_description) από τη βάση δεδομένων
+        # Εμφάνιση της περιγραφής (car_description) από τη βάση δεδομένων
         car_desc_text = car.get('car_description', 'No description available.')
         extra = QLabel(car_desc_text)
-        extra.setWordWrap(True)  # Για να αλλάζει γραμμή αν είναι μεγάλη η περιγραφή
+        extra.setWordWrap(True) 
         extra.setStyleSheet("""
             color: #7a8799;
             font-size: 11px;
@@ -464,13 +452,11 @@ class ReservationsWindow(QWidget):
         info_wrap.addWidget(branch)
         info_wrap.addWidget(extra)
 
-        # =========================
+
         # BOTTOM
-        # =========================
+
         bottom_row = QHBoxLayout()
         bottom_row.setSpacing(12)
-
-        # Το κουμπί Details αφαιρέθηκε από εδώ
 
         reservation = functions.GetReservationByCarID(car['car_id'], self.session_email)
 
@@ -504,14 +490,13 @@ class ReservationsWindow(QWidget):
             background: transparent;
         """)
 
-        # Προσθέτουμε πλέον μόνο την τιμή και το κουμπί Cancel
         bottom_row.addWidget(price_label)
-        bottom_row.addStretch()  # Σπρώχνει το Cancel τέρμα δεξιά και κρατάει την τιμή αριστερά
+        bottom_row.addStretch()
         bottom_row.addWidget(btn_cancel)
 
-        # =========================
+   
         # FINAL LAYOUT
-        # =========================
+
         layout.addLayout(top_row)
         layout.addWidget(image_box)
         layout.addLayout(chips_row)
