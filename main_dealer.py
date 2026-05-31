@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer, QDate
 from back_end import functions
 from datetime import datetime
-from reservation_page import ReservationsWindow
 from PySide6.QtGui import QPixmap, QIcon
 
 class FilterDialog(QDialog):
@@ -272,18 +271,21 @@ class MainDealerWindow(QMainWindow):
 
         btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
         btn_dashboard.clicked.connect(self.show_dashboard)
-        btn_reservations = self.make_sidebar_button("Reservations")
-        btn_reservations.clicked.connect(self.reservations)
         btn_settings = self.make_sidebar_button("Settings")
         btn_settings.clicked.connect(self.show_settings)
 
         self.nav_group.addButton(btn_dashboard)
-        self.nav_group.addButton(btn_reservations)
         self.nav_group.addButton(btn_settings)
 
         sidebar_layout.addWidget(btn_dashboard)
-        sidebar_layout.addWidget(btn_reservations)
         sidebar_layout.addWidget(btn_settings)
+        
+        btn_back_dealer = QPushButton("Back to Dealer")
+        btn_back_dealer.setCursor(Qt.PointingHandCursor)
+        btn_back_dealer.setMinimumHeight(46)
+        btn_back_dealer.clicked.connect(self.back_to_dealer)
+        sidebar_layout.addWidget(btn_back_dealer)
+        
         sidebar_layout.addStretch()
 
         self.btn_logout = QPushButton("Logout")
@@ -443,11 +445,9 @@ class MainDealerWindow(QMainWindow):
         content_layout.addWidget(self.cars_panel)
 
         # Pages Setup
-        self.res_page = ReservationsWindow(self.session_email)
         self.settings_page = self.create_settings_page()
 
-        self.stacked_widget.addWidget(self.dashboard_container) 
-        self.stacked_widget.addWidget(self.res_page)            
+        self.stacked_widget.addWidget(self.dashboard_container)         
         self.stacked_widget.addWidget(self.settings_page)       
         self.load_all_cars_immediately()
 
@@ -486,7 +486,11 @@ class MainDealerWindow(QMainWindow):
             if col > 2:
                 col = 0
                 row += 1
-
+    def back_to_dealer(self):
+        from dealer_page import DealerWindow
+        self.dealer_window = DealerWindow(self.session_email)
+        self.dealer_window.show()
+        self.close()
     def apply_sort(self):
         selected_sort = self.sort_combo.currentText()
         if not selected_sort:
@@ -545,7 +549,7 @@ class MainDealerWindow(QMainWindow):
         self.close()    
 
     def show_settings(self):
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentWidget(self.settings_page)
 
     def create_settings_page(self):
         settings_page = QWidget()
@@ -653,9 +657,6 @@ class MainDealerWindow(QMainWindow):
             self.password_status_label.setStyleSheet("color: #1f9d55; font-size: 13px; font-weight: 600;")
         else:
             self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600;")
-    
-    def reservations(self):  
-        self.stacked_widget.setCurrentIndex(1)
 
     def show_dashboard(self):
         self.stacked_widget.setCurrentIndex(0)

@@ -38,7 +38,7 @@ class DealerWindow(QMainWindow):
         shell_layout.setSpacing(0)
         outer_layout.addWidget(app_shell)
 
-        # Sidebar[cite: 3]
+        # Sidebar
         sidebar = QFrame()
         sidebar.setFixedWidth(220)
         sidebar.setStyleSheet("""
