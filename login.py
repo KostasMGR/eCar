@@ -21,8 +21,8 @@ class ResizableLogo(QLabel):
     def __init__(self, pixmap_path, parent=None):
         super().__init__(parent)
         self.orig_pixmap = QPixmap(pixmap_path)
-        self.setMinimumSize(1, 1) # Allow the layout to shrink it
-        self.setScaledContents(False) # We handle scaling manually for better quality
+        self.setMinimumSize(1, 1)
+        self.setScaledContents(False) 
 
     def paintEvent(self, event):
         if not self.orig_pixmap.isNull():
@@ -274,4 +274,4 @@ if __name__ == "__main__":
         window.show()
         sys.exit(app.exec())
     except Exception as e:
-        print(f"Κρίσιμο σφάλμα: {e}")
+        print(f"Fatal error: {e}")

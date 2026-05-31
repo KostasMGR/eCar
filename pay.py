@@ -15,7 +15,6 @@ class PaymentWindow(QWidget):
         self.start_date = start_date
         self.end_date = end_date
         
-        # Υπολογισμός τιμής για εμφάνιση στο UI
         from datetime import datetime
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
@@ -98,7 +97,7 @@ class PaymentWindow(QWidget):
 
         outer_layout.addWidget(card)
 
-        # Cancel Button - ΕΠΙΣΤΡΟΦΗ ΣΤΟ MAIN USER
+        # Cancel Button -ΕΠΙΣΤΡΟΦΗ ΣΤΟ MAIN USER
         self.cancel_btn = QPushButton("Cancel and Go Back")
         self.cancel_btn.setCursor(Qt.PointingHandCursor)
         self.cancel_btn.setStyleSheet("color: white; background: transparent; text-decoration: underline;")
@@ -108,7 +107,7 @@ class PaymentWindow(QWidget):
         self.showMaximized()
 
     def go_to_main(self):
-        from main_user import MainDashboard # Import εδώ για αποφυγή circular import
+        from main_user import MainDashboard 
         self.main_win = MainDashboard(self.session_email)
         self.main_win.show()
         self.close()
@@ -120,11 +119,7 @@ class PaymentWindow(QWidget):
 
         from back_end import functions
         try:
-            # Εκτέλεση κράτησης αφού η "πληρωμή" πέτυχε
             print("Car ID: "+ str(self.car_data['car_id']))
-            #car_id = functions.GetCarbyID(self.car_data)
-            #print("Car id from pay: " , car_id)
-           # car_id = functions.GetCarIDByLicense(self.car["license_plate"])
             functions.CreateReservation(self.session_email, self.start_date, self.end_date, str(self.car_data['car_id']))
             QMessageBox.information(self, "Success", "Payment Successful! Your car is reserved.")
             self.go_to_main()
@@ -132,35 +127,29 @@ class PaymentWindow(QWidget):
             QMessageBox.critical(self, "Error", f"Database error: {e}")
 
     def format_card(self, text):
-        # Αφαίρεση οτιδήποτε δεν είναι αριθμός
         digits = ''.join(filter(str.isdigit, text))
         
-        # ΚΟΒΟΥΜΕ αυστηρά στα 16 ψηφία maximum
         digits = digits[:16]
         
-        # Χωρισμός ανά 4 ψηφία με ένα κενό
         formatted = ' '.join(digits[i:i+4] for i in range(0, len(digits), 4))
         
         self.card_input.blockSignals(True)
         self.card_input.setText(formatted)
-        self.card_input.setCursorPosition(len(formatted)) # Κέρσορας πάντα στο τέλος
+        self.card_input.setCursorPosition(len(formatted))
         self.card_input.blockSignals(False)
 
     def format_expiry(self, text):
-        # Αφαίρεση οτιδήποτε δεν είναι αριθμός
         digits = ''.join(filter(str.isdigit, text))
         
-        # ΚΟΒΟΥΜΕ αυστηρά στα 4 ψηφία (Μήνας-Έτος)
         digits = digits[:4]
         
-        # Προσθήκη της καθέτου μετά τα πρώτα 2 ψηφία (MM/YY)
         formatted = digits
         if len(digits) > 2:
             formatted = digits[:2] + '/' + digits[2:]
             
         self.exp_input.blockSignals(True)
         self.exp_input.setText(formatted)
-        self.exp_input.setCursorPosition(len(formatted)) # Κέρσορας πάντα στο τέλος
+        self.exp_input.setCursorPosition(len(formatted))
         self.exp_input.blockSignals(False)
 
     def resizeEvent(self, event):
