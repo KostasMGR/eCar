@@ -1,0 +1,11 @@
+[2026-05-03 19:55:19] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+[2026-05-03 20:02:52] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-03 20:02:53] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-03 20:02:54] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-03 20:02:54] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-03 20:03:14] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-10 16:54:12] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-10 16:54:15] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[2026-05-31 17:09:43] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+[2026-07-05 14:53:32] Σφάλμα σύνδεσης με τη βάση (ConnectDB): 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+[2026-07-05 15:07:16] Σφάλμα σύνδεσης με τη βάση (CreateCar): 1406 (22001): Data too long for column 'license_plate' at row 1
