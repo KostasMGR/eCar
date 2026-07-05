@@ -233,25 +233,20 @@ class AdminWindow(QMainWindow):
         """
 
     def create_logs_page(self):
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # -> logismik/
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self.create_banner("System Logs", "Real-time activity monitoring."))
 
-        # --- Buttons ---
         button_layout = QHBoxLayout()
-
         logs_btn = QPushButton("Logs")
         errors_btn = QPushButton("Errors")
-
         button_layout.addWidget(logs_btn)
         button_layout.addWidget(errors_btn)
-
         layout.addLayout(button_layout)
 
-        # Scroll area
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
 
@@ -264,33 +259,26 @@ class AdminWindow(QMainWindow):
             background: #0f172a;
             padding: 20px;
         """)
-
         scroll.setWidget(log_text)
         layout.addWidget(scroll)
 
         def load_file(filename):
             try:
-                full_path = os.path.join(BASE_DIR, "logs",filename)
-                print("Opening the full_path:", full_path)  
-
+                full_path = os.path.join(BASE_DIR, "logs", filename)
+                print("Opening the full_path:", full_path)
                 with open(full_path, "r", encoding="utf-8") as f:
                     content = f.read()
-                    print("CONTENT LENGTH:", len(content))  
-
                     log_text.setText(content if content else "File is empty.")
                     log_text.adjustSize()
             except FileNotFoundError:
                 log_text.setText(f"{filename} not found.")
 
-        # Button actions
-      
         logs_btn.clicked.connect(lambda: load_file("logs.txt"))
         errors_btn.clicked.connect(lambda: load_file("errlogs.txt"))
 
-        # Load default
-        #load_file("logs.txt")
+        load_file("logs.txt")  # populate on page open
         return page
-
+    
     def delete_user(self, row):
         email_item = self.user_table.item(row, 2)
         if not email_item:

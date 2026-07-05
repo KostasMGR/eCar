@@ -1,5 +1,7 @@
 import sys
-import mysql.connector
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from PySide6.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QFrame, QMessageBox, QComboBox

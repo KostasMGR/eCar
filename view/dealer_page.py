@@ -1,5 +1,6 @@
 import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import shutil
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -348,12 +349,11 @@ class DealerWindow(QMainWindow):
         # Διαχείριση Φακέλου και Αντιγραφή Εικόνας
         if selected_img_path and os.path.exists(selected_img_path):
             try:
-                dest_folder = "imgs"
+                BASE_DIR = os.path.dirname(os.path.abspath(__file__))  
+                dest_folder = os.path.join(BASE_DIR, "imgs")
                 if not os.path.exists(dest_folder):
                     os.makedirs(dest_folder)
-                
                 dest_path = os.path.join(dest_folder, final_img_name)
-                
                 shutil.copy2(selected_img_path, dest_path)
             except Exception as e:
                 QMessageBox.critical(self, "File Error", f"Could not save image: {str(e)}")
